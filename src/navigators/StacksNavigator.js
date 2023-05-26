@@ -34,4 +34,12 @@ const CartStackNavigator = () => {
   );
 }
 
-export { MainStackNavigator, CartStackNavigator };
+const FirstStackNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Detail Screen" component={DetailsScreen} />
+    </Stack.Navigator>
+  );
+}
+
+export { MainStackNavigator, CartStackNavigator, FirstStackNavigator };
