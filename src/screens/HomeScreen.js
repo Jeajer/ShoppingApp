@@ -1,6 +1,9 @@
 import { 
   React,
-  useState } from 'react';
+  useState,
+  useRef,
+  useCallback ,
+  useMemo} from 'react';
 import {
   View, 
   Text,
@@ -16,6 +19,9 @@ import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MasonryList from '@react-native-seoul/masonry-list';
 import { BlurView } from 'expo-blur';
+import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import CustomBackdrop from "../components/CustomBackdrop";
+import FilterView from "../components/FilterView";
 
 const CATEGORIES = [
   "Clothing",
@@ -31,6 +37,11 @@ const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_45
 const HomeScreen = () => {
   const {colors} = useTheme();
   const [categoryIndex, setCategoryIndex] = useState(0);
+  const bottomSheetModalRef = useRef(null);
+
+  const openFilterModal = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
 
   return (
     <ScrollView>
@@ -94,6 +105,7 @@ const HomeScreen = () => {
             </TouchableOpacity>
 
             <TouchableOpacity 
+              onPress={openFilterModal}
               style={{
                 width: 52,  
                 alignItems: "center", 
@@ -166,20 +178,20 @@ const HomeScreen = () => {
         
         {/* MasonryList */}
         <MasonryList
-          data={[1,2,3,454,4,56,44]}
+          data={[1, 2, 3, 454, 4, 56, 44]}
           keyExtractor={item => item}
           numColumns={2}
-          contentContainerStyle={{paddingHorizontal: 24}}
+          contentContainerStyle={{paddingHorizontal: 16}}
           showsVerticalScrollIndicator={false}
           renderItem={({item, i}) => {
             return (
-              <TouchableOpacity 
+              <View style={{padding: 6}}>
+                <View 
                 style={{
                   aspectRatio: i === 0 ? 1 : 2/3,
                   position: "relative",
                   overflow: "hidden",
                   backgroundColor: colors.background,
-                  marginTop: 16,
                   borderRadius: 24,
                 }}>
                   <Image
@@ -190,7 +202,7 @@ const HomeScreen = () => {
                   <View style={[StyleSheet.absoluteFill,
                     {padding: 12,}]
                     }>
-                    <View style={{flexDirection: "row", gap: 8}}>
+                    <View style={{flexDirection: "row", gap: 8, padding: 4}}>
                       <Text 
                         style={{
                           flex: 1, 
@@ -218,20 +230,50 @@ const HomeScreen = () => {
                       style={{
                         flexDirection: "row",
                         backgroundColor: "rgba(0, 0, 0, 0.45)", 
-                        alignItems: "center"}}
+                        alignItems: "center",
+                        padding: 8,
+                        borderRadius: 100,
+                        overflow: "hidden"
+                      }}
                       intensity={20}>
-                      <Text style={{flex: 1, fontSize: 16, fontWeight: "600", color: "#fff"}}
+                      <Text 
+                        style={{
+                          flex: 1, 
+                          fontSize: 16, 
+                          fontWeight: "600", 
+                          color: "#fff",
+                          marginLeft: 4,
+                        }}
                         numberOfLines={1}>
                         $160.00
                       </Text>
+
+                      <TouchableOpacity 
+                        style={{
+                          paddingHorizontal: 16,
+                          paddingVertical: 8,
+                          borderRadius: 100,
+                          backgroundColor: "#fff"
+                      }}>
+                        <Icon name="basket-outline" size={20} color="#000" />
+                      </TouchableOpacity>
                     </BlurView>
                     
                   </View>        
-              </TouchableOpacity>);
+              </View>
+              </View>);
             }}
           onEndReachedThreshold={0.1}
         />
       </SafeAreaView>
+
+      <BottomSheetModal 
+        snapPoints={['80%']} 
+        index={0} 
+        ref={bottomSheetModalRef}
+        backdropComponent={(props) => <CustomBackdrop {...props} />}>
+          <FilterView/>
+        </BottomSheetModal>
     </ScrollView>
   );
 }
