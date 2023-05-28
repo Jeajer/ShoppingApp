@@ -4,7 +4,7 @@ import * as React from 'react';
 import { View, Text, useColorScheme, StyleSheet } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import TabsNavigator from './src/navigators/TabNavigator';
+import StacksNavigator from './src/navigators/StacksNavigator';
 import { useMemo } from 'react';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -42,7 +42,7 @@ const App = () => {
       <GestureHandlerRootView style={styles.container}>
         <NavigationContainer theme={theme}>
           <BottomSheetModalProvider>
-            <TabsNavigator />
+            <StacksNavigator />
           </BottomSheetModalProvider>
           <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         </NavigationContainer>
