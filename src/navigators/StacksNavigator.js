@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "../screens/HomeScreen";
 import DetailsScreen from "../screens/DetailsScreen";
 import CartScreen from "../screens/CartScreen";
+import Login from "../screens/Login";
 
 
 const Stack = createStackNavigator();
@@ -37,9 +38,10 @@ const CartStackNavigator = () => {
 const FirstStackNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Detail Screen" component={DetailsScreen} />
+      <Stack.Screen name="Login Screen" component={Login} />
+      {/* <Stack.Screen name="Signup Screen" component={Signup} /> */}
     </Stack.Navigator>
-  );
+  )
 }
 
 export { MainStackNavigator, CartStackNavigator, FirstStackNavigator };
