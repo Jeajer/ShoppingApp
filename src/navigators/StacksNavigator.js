@@ -1,12 +1,10 @@
-// ./navigation/StackNavigator.js
-
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "../screens/HomeScreen";
 import DetailsScreen from "../screens/DetailsScreen";
 import CartScreen from "../screens/CartScreen";
 import Login from "../screens/Login";
-
+import TabNavigator from "./TabNavigator"
 
 const Stack = createStackNavigator();
 
@@ -18,10 +16,10 @@ const screenOptionStyle = {
   headerBackTitle: "Back",
 };
 
-const MainStackNavigator = () => {
+const StacksNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Home Screen" component={HomeScreen} />
+      <Stack.Screen name="Home Screen" component={TabNavigator} />
       <Stack.Screen name="Details Screen" component={DetailsScreen} />
     </Stack.Navigator>
   );
@@ -44,4 +42,4 @@ const FirstStackNavigator = () => {
   )
 }
 
-export { MainStackNavigator, CartStackNavigator, FirstStackNavigator };
+export { StacksNavigator, CartStackNavigator, FirstStackNavigator };

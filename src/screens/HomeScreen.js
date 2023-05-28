@@ -32,9 +32,41 @@ const CATEGORIES = [
   "Accessories 4",
 ]
 
-const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg"
+const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg";
+const MESONARY_LIST_DATA = [
+  {
+    imageUrl:
+      "https://images.unsplash.com/photo-1521577352947-9bb58764b69a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=986&q=80",
+    title: "PUMA Everyday Hussle",
+    price: 160,
+  },
+  {
+    imageUrl:
+      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
+    title: "PUMA Everyday Hussle",
+    price: 180,
+  },
+  {
+    imageUrl:
+      "https://images.unsplash.com/photo-1556217477-d325251ece38?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1020&q=80",
+    title: "PUMA Everyday Hussle",
+    price: 200,
+  },
+  {
+    imageUrl:
+      "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
+    title: "PUMA Everyday Hussle",
+    price: 180,
+  },
+  {
+    imageUrl:
+      "https://images.unsplash.com/photo-1627225924765-552d49cf47ad?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
+    title: "PUMA Everyday Hussle",
+    price: 120,
+  },
+];
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
   const {colors} = useTheme();
   const [categoryIndex, setCategoryIndex] = useState(0);
   const bottomSheetModalRef = useRef(null);
@@ -130,10 +162,35 @@ const HomeScreen = () => {
           </View>
           <View style={{flexDirection: "row", height: 200, gap: 12}}>
             {/* Card */}
-            <Card/>
+            <Card
+              onPress={() => {
+                navigation.navigate("Details Screen", {
+                  id: "123"
+                });
+              }}
+              price={130}
+              imageUrl="https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80"
+            /> 
+            
             <View style={{flex: 1, gap: 12}}>
-              <Card/>
-              <Card/>
+              <Card
+                onPress={() => {
+                  navigation.navigate("Details Screen", {
+                    id: "456"
+                  });
+                }}
+                price={120}
+                imageUrl="https://images.unsplash.com/photo-1571945153237-4929e783af4a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80"
+              />
+              <Card
+                onPress={() => {
+                  navigation.navigate("Details Screen", {
+                    id: "789"
+                  });
+                }}
+                price={170}
+                imageUrl="https://images.unsplash.com/photo-1485218126466-34e6392ec754?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2342&q=80"
+              />
             </View>
           </View>
         </View>
@@ -271,18 +328,30 @@ const HomeScreen = () => {
         snapPoints={['80%']} 
         index={0} 
         ref={bottomSheetModalRef}
-        backdropComponent={(props) => <CustomBackdrop {...props} />}>
+        backdropComponent={(props) => <CustomBackdrop {...props} />}
+        backgroundStyle={{
+          borderRadius: 24,
+        }}>
           <FilterView/>
-        </BottomSheetModal>
+      </BottomSheetModal>
     </ScrollView>
   );
 }
 
 export default HomeScreen;
 
-const Card = () => {
+const Card = ({ 
+  price, 
+  imageUrl, 
+  onPress 
+} : {
+  price: number;
+  imageUrl: string;
+  onPress: () => void;
+}) => {
   return (
     <TouchableOpacity
+      onPress={onPress}
       style={{
         flex: 1,
         position: "relative",
@@ -292,7 +361,7 @@ const Card = () => {
     >
       <Image
         source={{
-          uri: "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/8b8054bd-e5e4-4c0d-9c6b-79c57367b041/nike-just-do-it.jpg",
+          uri: imageUrl,
         }}
         resizeMode="cover"
         style={{
@@ -315,7 +384,7 @@ const Card = () => {
         }}
       >
         <Text style={{ fontSize: 14, fontWeight: "600", color: "#fff" }}>
-          180 $
+          ${price}
         </Text>
       </View>
     </TouchableOpacity>
