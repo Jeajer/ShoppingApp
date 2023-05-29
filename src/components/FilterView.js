@@ -4,6 +4,7 @@ import { useTheme } from "@react-navigation/native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import PriceRangeSelector from "./PriceRangeSelector";
 
 const MIN_PRICE = 0;
 const MAX_PRICE = 500;
@@ -50,8 +51,8 @@ const SLEEVES = [
 ]
 
 const FilterView = () => {
-  const [minPrice, setMinPrice] = useState(50);
-  const [maxPrice, setMaxPrice] = useState(250);
+  const [startPrice, seStartPrice] = useState(50);
+  const [endPrice, setEndPrice] = useState(250);
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   return (
@@ -73,44 +74,13 @@ const FilterView = () => {
         </View>
 
         {/* Range Selector */}
-        <View style={{paddingHorizontal: 24 }}>
-          <View style={{marginBottom: 24}}>
-            <Text>Price Range</Text>
-          </View>
-
-          <View 
-            style={{
-              height: 1, 
-              width: "100%", 
-              backgroundColor: theme.colors.border,
-              position: "relative", }}>
-            <View 
-              style={{
-                position: "absolute",
-                left: `${(100 * minPrice) / MAX_PRICE}%`,
-                width: `${(100 * (maxPrice - minPrice)) / MAX_PRICE}%`,
-                height: "100%",
-                backgroundColor: theme.colors.primary}}>
-            </View>
-        
-            <View style={{position: "absolute", left: "10%" }}>
-              <SliderHandle/>
-            </View>
-            <View style={{position: "absolute", left: "50%" }}>
-              <SliderHandle/>
-            </View>
-          </View>  
-
-          <View 
-            style={{
-              flexDirection: "row", 
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: 12,}}>
-            <Text style={{ color: theme.colors.text, opacity: 0.5 }}>${MIN_PRICE}</Text>
-            <Text style={{ color: theme.colors.text, opacity: 0.5 }}>${MAX_PRICE}</Text>
-          </View>
-        </View>
+        <PriceRangeSelector 
+          minPrice={MIN_PRICE} 
+          maxPrice={MAX_PRICE}
+          startPrice={startPrice}
+          endPrice={endPrice}
+          onStartPriceChange={seStartPrice}
+          onEndPriceChange={setEndPrice}/>
 
         {/* Sport Category Filter */}
         <View style={{paddingHorizontal: 24}}>
@@ -226,39 +196,6 @@ const FilterView = () => {
 
 export default FilterView;
 
-
-const SliderHandle = () => {
-  const theme = useTheme();
-  return (
-    <View 
-      style={{
-        height: 24,
-        aspectRatio: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: 100,
-        borderColor: theme.colors.primary,
-        borderWidth: 2,
-        backgroundColor: theme.colors.background,
-        transform: [
-          {
-            translateX: -12,
-          },
-          {
-            translateY: -12,
-          },
-        ],
-      }}>
-      <View 
-        style={{
-          width: 3,
-          height:3,
-          borderRadius: 10,
-          backgroundColor: theme.colors.primary,
-      }}/>
-    </View>  
-  );
-};
 
 const Chip = ({
   isSelected, 
