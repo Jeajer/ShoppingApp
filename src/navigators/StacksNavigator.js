@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "../screens/HomeScreen";
 import DetailsScreen from "../screens/DetailsScreen";
 import CartScreen from "../screens/CartScreen";
+import Login from "../screens/Login";
 import TabNavigator from "./TabNavigator"
 
 const Stack = createStackNavigator();
@@ -24,4 +25,21 @@ const StacksNavigator = () => {
   );
 }
 
-export default StacksNavigator;
+const CartStackNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Cart Screen" component={CartScreen} />
+    </Stack.Navigator>
+  );
+}
+
+const FirstStackNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Login Screen" component={Login} />
+      {/* <Stack.Screen name="Signup Screen" component={Signup} /> */}
+    </Stack.Navigator>
+  )
+}
+
+export { StacksNavigator, CartStackNavigator, FirstStackNavigator };
