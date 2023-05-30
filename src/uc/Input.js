@@ -17,7 +17,7 @@ const Input = ({title, icon, placeholder, isPassword, keyboard, onFocus = () => 
                 {title}
             </Text>
 
-            <View style={[styles.passwordContainer, { borderColor: isFocused ? "#2B71F5" : "#B3B4B7" }]}>
+            <View style={[styles.passwordContainer, { borderColor: isFocused ? "#2078F4" : "#EAEDFB" }]}>
                 
                 <TextInput placeholder={placeholder}
                     placeholderTextColor='gray'
@@ -38,7 +38,7 @@ const Input = ({title, icon, placeholder, isPassword, keyboard, onFocus = () => 
                     secureTextEntry={isPassword}
                 >
                 </TextInput>    
-                <Icon name={icon} size={20} color={isFocused ? "#2B71F5" : "#000"} />
+                <Icon name={icon} size={20} color={isFocused ? "#2078F4" : "#B1B3CD"} />
             </View>            
         </View>
     )
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F6F7F9',
+        backgroundColor: '#F9F9FD',
         height: 50,     
         borderRadius: 10,   
         marginTop: 5,
