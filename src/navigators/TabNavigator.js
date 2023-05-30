@@ -1,35 +1,41 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as React from 'react';
-import HomeScreen from '../screens/HomeScreen';
 import { View } from 'react-native';
-import { CartStackNavigator, MainStackNavigator, FirstStackNavigator } from './StacksNavigator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import HomeScreen from "../screens/HomeScreen";
+import DetailsScreen from "../screens/DetailsScreen";
+import CartScreen from "../screens/CartScreen";
+import CustomBottomTab from "../components/CustomBottomTab";
 
 const Tab = createBottomTabNavigator();
 
 const TabsNavigator = () => {
     return (
-      <Tab.Navigator screenOptions={{tabBarShowLabel: false, headerShown: false}}>
+      <Tab.Navigator 
+        screenOptions={{
+          tabBarShowLabel: false, 
+          headerShown: false}}
+        tabBar={(props) => <CustomBottomTab {...props}/>}>
         <Tab.Screen name="Home"
-                    component={MainStackNavigator}
+                    component={HomeScreen}
                     options={{
                       tabBarIcon(props) {
                         return <Icon size={24} color="black" name="home" />}
                     }}/>
         <Tab.Screen name="Shop" 
-                    component={CartStackNavigator} 
+                    component={CartScreen} 
                     options={{
                       tabBarIcon(props) {
                         return <Icon size={24} color="black" name="shopping" />}
                     }}/>
         <Tab.Screen name="Cart" 
-                    component={CartStackNavigator} 
+                    component={CartScreen} 
                     options={{
                       tabBarIcon(props) {
                         return <Icon size={24} color="black" name="cart" />}
                     }}/>
         <Tab.Screen name="Account" 
-                    component={FirstStackNavigator} 
+                    component={CartScreen} 
                     options={{
                       tabBarIcon(props) {
                         return <Icon size={24} color="black" name="account" />}
