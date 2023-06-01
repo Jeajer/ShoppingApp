@@ -77,11 +77,12 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <ScrollView>
-      <SafeAreaView style={{paddingVertical: 24, gap: 24}}>
+      <SafeAreaView style={{ paddingVertical: 24, gap: 24, backgroundColor: 'white', }}>
         {/* Header Section */}
         <View style={{paddingHorizontal: 24, 
                       flexDirection: "row", 
                       alignItems: "center", 
+                      
                       gap: 8}}>
           <Image source={{uri: AVATAR_URL}}
             style={{width: 52, aspectRatio: 1, borderRadius: 52 }} 
