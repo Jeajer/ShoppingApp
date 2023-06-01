@@ -6,6 +6,8 @@ import HomeScreen from "../screens/HomeScreen";
 import DetailsScreen from "../screens/DetailsScreen";
 import CartScreen from "../screens/CartScreen";
 import CustomBottomTab from "../components/CustomBottomTab";
+import Login from '../screens/Login';
+import ProfileNavigator from './AuthNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -35,7 +37,7 @@ const TabsNavigator = () => {
                         return <Icon size={24} color="black" name="cart" />}
                     }}/>
         <Tab.Screen name="Account" 
-                    component={CartScreen} 
+                    component={ProfileNavigator} 
                     options={{
                       tabBarIcon(props) {
                         return <Icon size={24} color="black" name="account" />}
