@@ -2,7 +2,6 @@ import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, SafeAreaVi
 import React, {useState} from 'react'
 import Input from '../uc/Input'
 import PasswordBox from '../uc/PasswordBox'
-import DatepickerBox from '../uc/DatepickerBox'
 
 const img = "https://img.freepik.com/premium-vector/shopping-cart-with-gift-boxes-shopping-bags-from-online-shop-e-commerce-marketing-provided-with-sale-discount-blue_249405-55.jpg?w=1060"
 const fbImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png"
@@ -35,7 +34,7 @@ const Signup = ({ navigation }) => {
                                 width: 180,
                                 aspectRatio: 1,
                                 alignContent: "center",
-                                marginTop: 10,
+                                marginTop: -10,
                             }}
                             resizeMode="cover"
                         />
@@ -76,12 +75,6 @@ const Signup = ({ navigation }) => {
                         <PasswordBox
                             title='Confirm password'
                             placeholder='Enter your password again'
-                            keyboard='default'
-                        />
-
-                        <DatepickerBox
-                            title='Date of birth'
-                            icon='email-outline'
                             keyboard='default'
                         />
                         
@@ -160,7 +153,7 @@ const Signup = ({ navigation }) => {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginBottom: 70,
+                        marginBottom: 40,
                     }}>
                         <Text style={{
                             textAlign: 'center',
@@ -186,7 +179,8 @@ const Signup = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </ScrollView>            
+            </ScrollView>
+            
         </SafeAreaView>
     )
 }
