@@ -23,48 +23,6 @@ import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet
 import CustomBackdrop from "../components/CustomBackdrop";
 import FilterView from "../components/FilterView";
 
-const CATEGORIES = [
-  "Clothing",
-  "Shoes",
-  "Accessories 1",
-  "Accessories 2",
-  "Accessories 3",
-  "Accessories 4",
-]
-
-const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg";
-const MESONARY_LIST_DATA = [
-  {
-    imageUrl:
-      "https://images.unsplash.com/photo-1521577352947-9bb58764b69a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=986&q=80",
-    title: "PUMA Everyday Hussle",
-    price: 160,
-  },
-  {
-    imageUrl:
-      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
-    title: "PUMA Everyday Hussle",
-    price: 180,
-  },
-  {
-    imageUrl:
-      "https://images.unsplash.com/photo-1556217477-d325251ece38?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1020&q=80",
-    title: "PUMA Everyday Hussle",
-    price: 200,
-  },
-  {
-    imageUrl:
-      "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
-    title: "PUMA Everyday Hussle",
-    price: 180,
-  },
-  {
-    imageUrl:
-      "https://images.unsplash.com/photo-1627225924765-552d49cf47ad?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
-    title: "PUMA Everyday Hussle",
-    price: 120,
-  },
-];
 
 const HomeScreen = ({navigation}) => {
   const {colors} = useTheme();
@@ -77,12 +35,11 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <ScrollView>
-      <SafeAreaView style={{ paddingVertical: 24, gap: 24, backgroundColor: 'white', }}>
+      <SafeAreaView style={{paddingVertical: 24, gap: 24}}>
         {/* Header Section */}
         <View style={{paddingHorizontal: 24, 
                       flexDirection: "row", 
                       alignItems: "center", 
-                      
                       gap: 8}}>
           <Image source={{uri: AVATAR_URL}}
             style={{width: 52, aspectRatio: 1, borderRadius: 52 }} 
@@ -340,54 +297,3 @@ const HomeScreen = ({navigation}) => {
 }
 
 export default HomeScreen;
-
-const Card = ({ 
-  price, 
-  imageUrl, 
-  onPress 
-} : {
-  price: number;
-  imageUrl: string;
-  onPress: () => void;
-}) => {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={{
-        flex: 1,
-        position: "relative",
-        overflow: "hidden",
-        borderRadius: 24,
-      }}
-    >
-      <Image
-        source={{
-          uri: imageUrl,
-        }}
-        resizeMode="cover"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-        }}
-      />
-      <View
-        style={{
-          position: "absolute",
-          left: 12,
-          top: 12,
-          paddingHorizontal: 12,
-          paddingVertical: 8,
-          backgroundColor: "rgba(0,0,0,0.25)",
-          borderRadius: 100,
-        }}
-      >
-        <Text style={{ fontSize: 14, fontWeight: "600", color: "#fff" }}>
-          ${price}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-};

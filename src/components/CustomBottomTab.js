@@ -24,11 +24,19 @@ const CustomBottomTab = (props: BottomTabBarButtonProps) => {
                                 flex: 1,
                                 alignItems: "center",
                                 justifyContent: "center",
+<<<<<<< HEAD
+                                backgroundColor: isActive ? colors.primary : "transparent",
+                                borderRadius: 32}}>
+                            <Icon name={route.name === "Home" ? "home" : route.name === "Shop" ? "shopping" : route.name === "Favorite" ? "heart" : "account"}
+                                size={24} 
+                                color={isActive ? "#fff" : colors.text}
+=======
                                 flexDirection: "row",
                                 paddingVertical: 8
                             }}
                             onPress={() => props.navigation.navigate(route.name)}>
                             <View
+>>>>>>> 547e54289efabc6ec10ed4eada1245b1b6d53f41
                                 style={{
                                     width: 32,
                                     height: 32,

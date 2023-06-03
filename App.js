@@ -1,16 +1,19 @@
-// In App.js in a new project
-
-import * as React from 'react';
-import { View, Text, useColorScheme, StyleSheet } from 'react-native';
-import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
-import StacksNavigator from './src/navigators/StacksNavigator';
-import { useMemo } from 'react';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View, useColorScheme } from "react-native";
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+  Theme,
+} from "@react-navigation/native";
+import StacksNavigator from "./src/navigators/StacksNavigator";
+import { useMemo } from "react";
+import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-const App = () => {
+export default function App() {
   const colorScheme = useColorScheme();
 
   const theme: Theme = useMemo(
@@ -44,7 +47,7 @@ const App = () => {
           <BottomSheetModalProvider>
             <StacksNavigator />
           </BottomSheetModalProvider>
-          <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+          <StatusBar  />
         </NavigationContainer>
       </GestureHandlerRootView>
     </SafeAreaProvider>
@@ -57,6 +60,11 @@ export default App
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+<<<<<<< HEAD
+  },
+});
+=======
   }
   }
 )
+>>>>>>> 547e54289efabc6ec10ed4eada1245b1b6d53f41
