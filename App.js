@@ -42,7 +42,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider style={{ flex: 1 }}>
-      <GestureHandlerRootView style={styles.container}>
+      <GestureHandlerRootView style={{flex: 1}}>
         <NavigationContainer theme={theme}>
           <BottomSheetModalProvider>
             <StacksNavigator />
@@ -53,18 +53,3 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
-
-
-export default App
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-<<<<<<< HEAD
-  },
-});
-=======
-  }
-  }
-)
->>>>>>> 547e54289efabc6ec10ed4eada1245b1b6d53f41
