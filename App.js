@@ -54,8 +54,17 @@ export default function App() {
   );
 }
 
+
+export default App
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+<<<<<<< HEAD
   },
 });
+=======
+  }
+  }
+)
+>>>>>>> 547e54289efabc6ec10ed4eada1245b1b6d53f41

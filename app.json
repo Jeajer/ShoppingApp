@@ -1,5 +1,7 @@
 {
   "expo": {
+    "jsEngine": "hermes",
+      
     "name": "ShoppingApp",
     "slug": "ShoppingApp",
     "version": "1.0.0",
@@ -15,7 +17,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "jsEngine": "jsc"
     },
     "android": {
       "adaptiveIcon": {
