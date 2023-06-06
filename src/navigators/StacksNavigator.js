@@ -5,6 +5,7 @@ import DetailsScreen from "../screens/DetailsScreen";
 import CartScreen from "../screens/CartScreen";
 import ProfileNavigator from "./AuthNavigator";
 import TabNavigator from "./TabNavigator";
+import OnboardingScreen from "../screens/OnboardingScreen";
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,7 @@ const screenOptionStyle = {
 const StacksNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Onboarding Screen" component={OnboardingScreen} />
       <Stack.Screen name="Home Screen" component={TabNavigator} />
       <Stack.Screen name="Details Screen" component={DetailsScreen} />
       <Stack.Screen name="Cart Screen" component={CartScreen} />
