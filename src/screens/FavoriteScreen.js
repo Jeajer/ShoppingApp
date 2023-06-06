@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
-const CartScreen = ({navigation}) => {
+const FavoriteScreen = ({navigation}) => {
   const {colors} = useTheme();
   
   const [product, setProduct] = useState();
@@ -78,7 +78,7 @@ const CartScreen = ({navigation}) => {
   return (
     <SafeAreaView style={{
       paddingVertical: 24,
-      gap: 10,
+      gap: 15,
       }}>
       <View style={{
           paddingHorizontal: 24,
@@ -86,21 +86,21 @@ const CartScreen = ({navigation}) => {
           alignItems: "center",
           flexDirection: "row"
         }}>
-          <TouchableOpacity
-           onPress={() => {navigation.goBack()}}>
-            <Icon name='chevron-left' size={30} color="#000"/>
-          </TouchableOpacity>
-          <Text style={{
-            fontSize: 24,
-            fontWeight: "700",
-          }}>My cart</Text>
-          <View style={{width: 30}}/>
+            <View style={{width: 37}}/>
+          
+            <Text style={{
+                fontSize: 24,
+                fontWeight: "700",
+            }}>Favorite</Text>
+            <TouchableOpacity
+                onPress={()=> {navigation.navigate("Cart Screen")}}>
+                <Icon name='cart' size={30} color="#000"/>
+            </TouchableOpacity>
       </View>
       
-      <View 
-        style={{
-          height: 450,
-          }}>
+      <View style={{
+        height: 600
+      }}>
         <SwipeListView
           data={listData}
           contentContainerStyle={{paddingHorizontal: 16}}
@@ -256,209 +256,32 @@ const CartScreen = ({navigation}) => {
           onRowDidOpen={onRowDidOpen}/>
       </View>
 
-      <View style={{
-        paddingHorizontal: 24,
-        gap: 10,        
-      }}>
-        <Text style={{
-          fontSize: 18,
-          fontWeight: "600",
-        }}>
-          Promo Code
-        </Text>
-
-        <View
-          elevation={3}
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            padding: 7,
-            borderRadius: 10,
-            backgroundColor:colors.background,
-            shadowColor: colors.text,
-            shadowOpacity: 0.5,
-            shadowRadius: 2,
-            shadowOffset: {
-              height: 0.5,
-              width: 1
-            }
-          }}>
-          
-          <TextInput
-            style={{
-              fontSize: 14,
-              fontWeight: "400",
-            }}
-            onChangeText={onChangeText}
-            value={text}
-            placeholder="Insert your coupon code"
-          />
-
-          <TouchableOpacity
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: colors.text,
-              borderRadius: 8,
-            }}>
-            <Text 
-              style={{
-                fontSize: 13,
-                fontWeight: "600",
-                color: colors.background,
-                paddingHorizontal: 12,
-                paddingVertical: 7,
-              }}>
-              Apply
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View
-        style={{
-          paddingHorizontal: 30,
-          gap: 8,
-          marginTop: 10
-        }}>
-        <View 
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "400",
-            color: colors.text,
-            opacity: 0.8
-          }}>
-            Items (3)
-          </Text>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            ${(600000).toLocaleString()}
-          </Text>
-        </View>
-
-        <View 
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "400",
-            color: colors.text,
-            opacity: 0.8
-          }}>
-            Shipping
-          </Text>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            ${(40000).toLocaleString()}
-          </Text>
-        </View>
-
-        <View 
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "400",
-            color: colors.text,
-            opacity: 0.8
-          }}>
-            Import charges
-          </Text>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            ${(128000).toLocaleString()}
-          </Text>
-        </View>
-
-        <View 
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginTop: 7,
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            Total Price
-          </Text>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: "red",
-          }}>
-            ${(768000).toLocaleString()}
-          </Text>
-        </View>
-
-        
-      </View>
-
       <View 
             style={{
-              paddingHorizontal: 24,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: 10,
-            }}>
-
-            <View >
-              <Text
-                style={{ color: colors.text, opacity: 0.75, marginBottom: 4 }}
-              >
-                Total Price
-              </Text>
-              <Text
-                style={{ color: "red", fontSize: 18, fontWeight: "600" }}
-              >
-                ${(768000).toLocaleString()}
-              </Text>
-            </View>
+              paddingHorizontal: 30,
+            }}> 
 
             <TouchableOpacity
+              onPress={() => {navigation.navigate("Cart Screen")}}
               style={{
                 backgroundColor: colors.primary,
                 height: 64,
                 borderRadius: 64,
                 alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
+                justifyContent: "space-between",
                 flexDirection: "row",
                 padding: 12,
               }}
             >
+                <View/>
               <Text
                 style={{
                   fontSize: 16,
                   fontWeight: "600",
                   color: colors.background,
-                  paddingHorizontal: 16,
                 }}
               >
-                Proceed to checkout
+                Add all to my cart
               </Text>
 
               <View
@@ -469,13 +292,12 @@ const CartScreen = ({navigation}) => {
                   borderRadius: 40,
                   alignItems: "center",
                   justifyContent: "center",
-                }}
-              >
+                }}>
                 <Icon name={"arrow-right"} size={24} color={colors.text} />
               </View>
             </TouchableOpacity>
           
-          </View>
+        </View>
           
       
     </SafeAreaView>
@@ -483,5 +305,5 @@ const CartScreen = ({navigation}) => {
 };
 
 
-export default CartScreen;
+export default FavoriteScreen;
 

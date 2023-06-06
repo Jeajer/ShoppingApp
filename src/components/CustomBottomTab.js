@@ -29,7 +29,7 @@ const CustomBottomTab = (props: BottomTabBarProps) => {
                                 justifyContent: "center",
                                 backgroundColor: isActive ? colors.primary : "transparent",
                                 borderRadius: 32}}>
-                            <Icon name={route.name === "Home" ? "home" : route.name === "Shop" ? "shopping" : route.name === "Cart" ? "cart" : "account"}
+                            <Icon name={route.name === "Home" ? "home" : route.name === "Shop" ? "shopping" : route.name === "Favorite" ? "heart" : "account"}
                                 size={24} 
                                 color={isActive ? "#fff" : colors.text}
                                 style={{
