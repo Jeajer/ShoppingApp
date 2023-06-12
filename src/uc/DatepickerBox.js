@@ -19,8 +19,10 @@ const DatepickerBox = ({ title, icon, isPassword, keyboard, onFocus = () => { { 
         setOpen(!open);
     }
 
-    function handleChange (propDate) {
-        setDate(propDate)
+    function handleChange (date) {
+        this.setState({
+            startDate: date,
+        });
     }
 
     return (
@@ -57,7 +59,7 @@ const DatepickerBox = ({ title, icon, isPassword, keyboard, onFocus = () => { { 
                     keyboardType={keyboard}
                     secureTextEntry={isPassword}
                 >
-                    Enter your date of birth
+                    {date}
                 </Text>
                 <Icon name={icon} size={20} color={isFocused ? "#2078F4" : "#B1B3CD"} />
             </TouchableOpacity>
@@ -72,7 +74,7 @@ const DatepickerBox = ({ title, icon, isPassword, keyboard, onFocus = () => { { 
                         <DatePicker
                             mode='calendar'
                             selected={date}
-                            onDateChanged={handleChange}
+                            onDateChange={(date)=>setDate(date)}
                             minimumDate={startDate}
                         />
                         <TouchableOpacity onPress={handleOnPress}>                            
@@ -96,7 +98,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 10,
         marginTop: 5,
-        paddingHorizontal: 15,
+        paddingHorizontal: 10,
         borderWidth: 2,
     },
     centeredView: {
