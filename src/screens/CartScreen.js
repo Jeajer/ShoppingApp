@@ -100,6 +100,7 @@ const CartScreen = ({navigation}) => {
       <View 
         style={{
           height: 450,
+          paddingVertical: 5,
           }}>
         <SwipeListView
           data={listData}
@@ -258,6 +259,8 @@ const CartScreen = ({navigation}) => {
 
       <View style={{
         paddingHorizontal: 24,
+        paddingVertical: 10,
+        marginTop: 15,
         gap: 10,        
       }}>
         <Text style={{
@@ -272,7 +275,7 @@ const CartScreen = ({navigation}) => {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            padding: 7,
+            padding: 10,
             borderRadius: 10,
             backgroundColor:colors.background,
             shadowColor: colors.text,
@@ -288,6 +291,7 @@ const CartScreen = ({navigation}) => {
             style={{
               fontSize: 14,
               fontWeight: "400",
+              paddingHorizontal: 10,
             }}
             onChangeText={onChangeText}
             value={text}
@@ -319,100 +323,30 @@ const CartScreen = ({navigation}) => {
         style={{
           paddingHorizontal: 30,
           gap: 8,
-          marginTop: 10
         }}>
         <View 
           style={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
+            padding: 10
           }}>
           <Text style={{
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: "400",
             color: colors.text,
             opacity: 0.8
           }}>
-            Items (3)
+            Promotion:
           </Text>
           <Text style={{
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: "600",
             color: colors.text,
           }}>
             ${(600000).toLocaleString()}
           </Text>
         </View>
-
-        <View 
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "400",
-            color: colors.text,
-            opacity: 0.8
-          }}>
-            Shipping
-          </Text>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            ${(40000).toLocaleString()}
-          </Text>
-        </View>
-
-        <View 
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "400",
-            color: colors.text,
-            opacity: 0.8
-          }}>
-            Import charges
-          </Text>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            ${(128000).toLocaleString()}
-          </Text>
-        </View>
-
-        <View 
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginTop: 7,
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            Total Price
-          </Text>
-          <Text style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: "red",
-          }}>
-            ${(768000).toLocaleString()}
-          </Text>
-        </View>
-
         
       </View>
 
@@ -427,7 +361,7 @@ const CartScreen = ({navigation}) => {
 
             <View >
               <Text
-                style={{ color: colors.text, opacity: 0.75, marginBottom: 4 }}
+                style={{ color: colors.text, fontSize: 16, opacity: 0.75, marginBottom: 4 }}
               >
                 Total Price
               </Text>
@@ -439,6 +373,7 @@ const CartScreen = ({navigation}) => {
             </View>
 
             <TouchableOpacity
+              onPress={() => navigation.navigate("Check Out Screen")}
               style={{
                 backgroundColor: colors.primary,
                 height: 64,
