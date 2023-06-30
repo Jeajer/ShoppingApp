@@ -86,10 +86,9 @@ const FavoriteScreen = ({navigation}) => {
           alignItems: "center",
           flexDirection: "row"
         }}>
-            <View style={{width: 37}}/>
           
             <Text style={{
-                fontSize: 24,
+                fontSize: 30,
                 fontWeight: "700",
             }}>Favorite</Text>
             <TouchableOpacity
@@ -99,7 +98,7 @@ const FavoriteScreen = ({navigation}) => {
       </View>
       
       <View style={{
-        height: 600
+        height: "81%"
       }}>
         <SwipeListView
           data={listData}

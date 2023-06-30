@@ -116,7 +116,7 @@ const Login = ({ navigation }) => {
                     </View>
 
                     <TouchableOpacity
-                        onPress={() => { }}
+                        onPress={() => {navigation.navigate("Profile1 Screen") }}
                         style={{
                             backgroundColor: '#1E1D2E',
                             marginTop: 50,

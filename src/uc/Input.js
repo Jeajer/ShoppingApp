@@ -3,7 +3,7 @@ import React from 'react'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { isAssertEntry } from 'typescript'
 
-const Input = ({title, icon, placeholder, isPassword, keyboard, onFocus = () => {{}}}) => {
+const Input = ({title, icon, placeholder, isPassword, keyboard, onFocus, onChangeText, value, maxLength}) => {
 
     const [isFocused, setIsFocused] = React.useState(false);
 
@@ -28,14 +28,16 @@ const Input = ({title, icon, placeholder, isPassword, keyboard, onFocus = () => 
                         fontSize: 16,
                         width: '90%',
                     }}
+                    onChangeText={onChangeText}
                     onFocus={
                         () => {
-                            onFocus();
                             setIsFocused(true);
                         }}
                     onBlur={() => { setIsFocused(false) }}
                     keyboardType={keyboard}
                     secureTextEntry={isPassword}
+                    value={value}
+                    maxLength={maxLength}
                 >
                 </TextInput>    
                 <Icon name={icon} size={20} color={isFocused ? "#2078F4" : "#B1B3CD"} />

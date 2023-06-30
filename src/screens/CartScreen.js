@@ -99,7 +99,7 @@ const CartScreen = ({navigation}) => {
       
       <View 
         style={{
-          height: 450,
+          height: "58%",
           paddingVertical: 5,
           }}>
         <SwipeListView
