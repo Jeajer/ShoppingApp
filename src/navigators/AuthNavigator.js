@@ -22,21 +22,4 @@ const ProfileNavigator = () => {
     );
 }
 
-// const CartStackNavigator = () => {
-//   return (
-//     <Stack.Navigator screenOptions={{headerShown: false}}>
-//       <Stack.Screen name="Cart Screen" component={CartScreen} />
-//     </Stack.Navigator>
-//   );
-// }
-
-// const FirstStackNavigator = () => {
-//   return (
-//     <Stack.Navigator screenOptions={{headerShown: false}}>
-//       <Stack.Screen name="Login Screen" component={Login} />
-//       <Stack.Screen name="Signup Screen" component={Signup} />
-//     </Stack.Navigator>
-//   )
-// }
-
 export default ProfileNavigator;
