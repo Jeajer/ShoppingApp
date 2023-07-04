@@ -9,14 +9,7 @@ const CustomBottomTab = (props: BottomTabBarProps) => {
     const {colors} = useTheme();
     return(
         <SafeAreaView edges={["bottom"]}>
-            <View 
-                style={{
-                    flexDirection: "row", 
-                    alignItems: "center", 
-                    backgroundColor: 'white',
-                    borderTopColor: '#EFF0F9',
-                    borderTopWidth: 1,
-                    }}>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
                 {props.state.routes.map((route, i) => {
                 const isActive = i == props.state.index;
                 return(
@@ -26,7 +19,7 @@ const CustomBottomTab = (props: BottomTabBarProps) => {
                             alignItems: "center", 
                             justifyContent: "center", 
                             flexDirection: "row",
-                            paddingVertical: 12}}
+                            paddingVertical: 8}}
                         onPress={() => props.navigation.navigate(route.name)}>
                         <View 
                             style={{

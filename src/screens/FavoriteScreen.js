@@ -1,20 +1,18 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Button } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
-const FavoriteScreen = ({ navigation }) => {
-  const { colors } = useTheme();
-
+const FavoriteScreen = ({navigation}) => {
+  const {colors} = useTheme();
+  
   const [product, setProduct] = useState();
-  const [total, setTotal] = useState(null);
+  const [total, setTotal] = useState(null); 
   const [count, setCount] = useState(1);
   const [text, onChangeText] = useState('');
-
-  const window = Dimensions.get('window');
 
   const [listData, setListData] = useState([
     {
@@ -65,7 +63,7 @@ const FavoriteScreen = ({ navigation }) => {
 
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
-      rowMap[rowKey].closeRow();
+        rowMap[rowKey].closeRow();
     }
   };
 
@@ -78,246 +76,231 @@ const FavoriteScreen = ({ navigation }) => {
   };
 
   return (
-    <>
-      <SafeAreaView style={{
-        paddingVertical: 24,
-        gap: 15,
-        flex: 1,
-        backgroundColor: 'white',
-        
+    <SafeAreaView style={{
+      paddingVertical: 24,
+      gap: 15,
       }}>
-        <View style={{
+      <View style={{
           paddingHorizontal: 24,
           justifyContent: "space-between",
           alignItems: "center",
           flexDirection: "row"
         }}>
-          <View style={{ width: 37 }} />
+            <View style={{width: 37}}/>
+          
+            <Text style={{
+                fontSize: 24,
+                fontWeight: "700",
+            }}>Favorite</Text>
+            <TouchableOpacity
+                onPress={()=> {navigation.navigate("Cart Screen")}}>
+                <Icon name='cart' size={30} color="#000"/>
+            </TouchableOpacity>
+      </View>
+      
+      <View style={{
+        height: 600
+      }}>
+        <SwipeListView
+          data={listData}
+          contentContainerStyle={{paddingHorizontal: 16}}
+          renderItem={ (data, rowMap) => {
+            return(
+            <View 
+              style={{
+                flex: 1,
+                backgroundColor: colors.background, 
+                height: 150, 
+                padding: 6,
+                
+              }}>
+              <View 
+                style={{
+                flexDirection: "row",  
+                gap: 8,
+                alignItems: "flex-end",
+                justifyContent: "space-between"
+              }}>
+                <Image
+                    source={{uri: data.item.imageUrl}}
+                    resizeMode="contain"
+                    height={120}
+                    width={120}
+                    style={{borderRadius: 24,}}/>
 
-          <Text style={{
-            fontSize: 24,
-            fontWeight: "700",
-          }}>Favorite</Text>
-          <TouchableOpacity
-            onPress={() => { navigation.navigate("Cart Screen") }}>
-            <Icon name='cart' size={30} color="#000" />
-          </TouchableOpacity>
-        </View>
+                <View style={{padding: 12, flex: 1, gap: 6}}>
+                  <Text 
+                      style={{
+                        fontSize: 15, 
+                        fontWeight: "500",
+                        color: colors.text,
+                        textShadowColor: "rgba(0,0,0,0.2)",
+                        textShadowOffset: {
+                          height: 1,
+                          width: 0,
+                        },
+                        textShadowRadius: 4,
+                      }}>
+                          {data.item.title}
+                  </Text>
 
-        <View
-          style={{
-            // height: window.height / 1.45,
-            marginBottom: 25,
-          }}>
-          <SwipeListView
-            data={listData}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
-            renderItem={(data, rowMap) => {
-              return (
-                <View
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'white',
-                    height: 150,
-                    padding: 6,
-                    
-                  }}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      gap: 8,
-                      alignItems: "flex-end",
-                      justifyContent: "space-between",
-                      backgroundColor: 'white',
-                    }}>
-                    <Image
-                      source={{ uri: data.item.imageUrl }}
-                      resizeMode="contain"
-                      height={120}
-                      width={120}
-                      style={{ borderRadius: 24, }} />
-
-                    <View style={{ padding: 12, flex: 1, gap: 6 }}>
-                      <Text
+                  <View style={{flexDirection: "row", gap: 7, alignItems: "center"}}>                    
+                    <View 
                         style={{
-                          fontSize: 15,
-                          fontWeight: "500",
-                          color: colors.text,
-                          textShadowColor: "rgba(0,0,0,0.2)",
-                          textShadowOffset: {
-                            height: 1,
-                            width: 0,
-                          },
-                          textShadowRadius: 4,
-                        }}>
-                        {data.item.title}
-                      </Text>
-
-                      <View style={{ flexDirection: "row", gap: 7, alignItems: "center" }}>
-                        <View
-                          style={{
-                            backgroundColor: data.item.color,
-                            width: 16,
-                            height: 16,
-                            borderRadius: 8,
-                          }} />
-                        <Text
-                          style={{
-                            fontSize: 14,
-                            fontWeight: "400",
-                          }}>{data.item.color}</Text>
-                      </View>
-
-                      {/* Quantity Button */}
-                      <View style={{ alignItems: "flex-start" }}>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            gap: 10,
-                            backgroundColor: colors.primary,
-                            padding: 6,
-                            borderRadius: 100,
-                          }}>
-                          <TouchableOpacity
-                            onPress={() => setCount((count) => Math.max(1, count - 1))}
-                            style={{
-                              backgroundColor: colors.card,
-                              width: 24,
-                              aspectRatio: 1,
-                              alignItems: "center",
-                              justifyContent: "center",
-                              borderRadius: 24,
-                            }}>
-                            <Icon name={"minus"} size={15} color={colors.text} />
-                          </TouchableOpacity>
-                          <Text
-                            style={{
-                              fontSize: 12,
-                              fontWeight: "600",
-                              color: colors.background
-                            }}>{count}</Text>
-                          <TouchableOpacity
-                            onPress={() => setCount((count) => Math.min(10, count + 1))}
-                            style={{
-                              backgroundColor: colors.card,
-                              width: 24,
-                              aspectRatio: 1,
-                              alignItems: "center",
-                              justifyContent: "center",
-                              borderRadius: 24,
-                            }}>
-                            <Icon name={"plus"} size={15} color={colors.text} />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </View>
-
-                    <View style={{ justifyContent: "flex-end", alignItems: "flex-end" }}>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          fontWeight: "600",
-                          color: colors.text,
-                          paddingHorizontal: 16,
-                          paddingVertical: 16,
-                        }}
-                        numberOfLines={1}>
-                        ${data.item.price}
-                      </Text>
-                    </View>
-
-                  </View>
-                </View>
-              )
-            }}
-            renderHiddenItem={(data, rowMap) => {
-              return (
-                <View
-                  style={{
-                    alignItems: "center",
-                    justifyContent: 'center',
-                    height: 150,
-                    backgroundColor: "red",
-                    borderRadius: 24,
-                  }}>
-                  <TouchableOpacity
-                    onPress={() => deleteRow(rowMap, data.item.key)}
-                    style={{
-                      alignSelf: "flex-end",
-                      alignItems: "center",
-                      justifyContent: 'center',
-                      width: 100,
-                      gap: 7,
-                    }}>
-                    <Icon name="delete-outline" size={22} color={colors.background} />
-                    <Text
+                          backgroundColor: data.item.color, 
+                          width: 16, 
+                          height: 16,
+                          borderRadius: 8,
+                      }}/>
+                    <Text 
                       style={{
                         fontSize: 14,
+                        fontWeight: "400",
+                    }}>{data.item.color}</Text>
+                  </View>
+
+                  {/* Quantity Button */}
+                  <View style={{alignItems: "flex-start"}}>
+                  <View 
+                    style={{
+                      flexDirection: "row", 
+                      alignItems: "center",
+                      gap: 10, 
+                      backgroundColor: colors.primary,
+                      padding: 6,
+                      borderRadius: 100,}}>
+                    <TouchableOpacity
+                      onPress={() => setCount((count) => Math.max(1, count - 1))}
+                      style={{
+                        backgroundColor: colors.card,
+                        width: 24,
+                        aspectRatio: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 24,
+                      }}>
+                        <Icon name={"minus"} size={15} color={colors.text}/>
+                    </TouchableOpacity>
+                    <Text 
+                      style={{
+                        fontSize: 12,
                         fontWeight: "600",
-                        color: colors.background,
-                      }}>Delete</Text>
-                  </TouchableOpacity>
+                        color: colors.background
+                      }}>{count}</Text>
+                    <TouchableOpacity
+                      onPress={() => setCount((count) => Math.min(10, count + 1))}
+                      style={{
+                        backgroundColor: colors.card,
+                        width: 24,
+                        aspectRatio: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 24,
+                      }}>
+                        <Icon name={"plus"} size={15} color={colors.text}/>
+                    </TouchableOpacity>
+                  </View>
+                  </View>
                 </View>
-              )
-            }}
-            rightOpenValue={-100}
-            leftOpenValue={0}
-            previewRowKey={'0'}
-            previewOpenValue={-40}
-            previewOpenDelay={3000}
-            onRowDidOpen={onRowDidOpen} />
-        </View>
-      </SafeAreaView>
-      <View
-        style={{
-          paddingHorizontal: 30,
-          borderTopColor: '#EFF0F9',
-          borderTopWidth: 1,
-          paddingVertical: 15,
-          backgroundColor: 'white',
-        }}
-        
-        >
 
-        <TouchableOpacity
-          onPress={() => { navigation.navigate("Cart Screen") }}
-          style={{
-            backgroundColor: colors.primary,
-            height: 64,
-            borderRadius: 64,
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexDirection: "row",
-            padding: 12,
-          }}
-        >
-          <View />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: colors.background,
-            }}
-          >
-            Add all to my cart
-          </Text>
-
-          <View
-            style={{
-              backgroundColor: colors.card,
-              width: 40,
-              aspectRatio: 1,
-              borderRadius: 40,
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-            <Icon name={"arrow-right"} size={24} color={colors.text} />
-          </View>
-        </TouchableOpacity>
-
+                <View style={{justifyContent: "flex-end", alignItems: "flex-end"}}>
+                <Text 
+                  style={{
+                    fontSize: 16, 
+                    fontWeight: "600", 
+                    color: colors.text,
+                    paddingHorizontal: 16,
+                    paddingVertical: 16,
+                  }}
+                  numberOfLines={1}>
+                  ${data.item.price}
+                </Text>
+                </View>
+                    
+              </View>
+            </View>
+          )}}
+          renderHiddenItem={ (data, rowMap) => {
+            return(
+            <View 
+              style={{
+                alignItems: "center",
+                justifyContent: 'center',
+                height: 150,
+                backgroundColor: "red",
+                borderRadius: 24,}}>
+                <TouchableOpacity 
+                  onPress={() => deleteRow(rowMap, data.item.key)}
+                  style={{
+                  alignSelf: "flex-end",
+                  alignItems: "center",
+                  justifyContent: 'center',
+                  width: 100,
+                  gap: 7,
+                  }}>
+                  <Icon name="delete-outline" size={22} color={colors.background}/>
+                  <Text 
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "600",
+                      color: colors.background,
+                  }}>Delete</Text>
+                </TouchableOpacity>
+            </View>
+          )}}
+          rightOpenValue={-100}
+          leftOpenValue={0}
+          previewRowKey={'0'}
+          previewOpenValue={-40}
+          previewOpenDelay={3000}
+          onRowDidOpen={onRowDidOpen}/>
       </View>
-    </>
+
+      <View 
+            style={{
+              paddingHorizontal: 30,
+            }}> 
+
+            <TouchableOpacity
+              onPress={() => {navigation.navigate("Cart Screen")}}
+              style={{
+                backgroundColor: colors.primary,
+                height: 64,
+                borderRadius: 64,
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexDirection: "row",
+                padding: 12,
+              }}
+            >
+                <View/>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "600",
+                  color: colors.background,
+                }}
+              >
+                Add all to my cart
+              </Text>
+
+              <View
+                style={{
+                  backgroundColor: colors.card,
+                  width: 40,
+                  aspectRatio: 1,
+                  borderRadius: 40,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+                <Icon name={"arrow-right"} size={24} color={colors.text} />
+              </View>
+            </TouchableOpacity>
+          
+        </View>
+          
+      
+    </SafeAreaView>
   );
 };
 
