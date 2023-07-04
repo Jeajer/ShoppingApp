@@ -71,10 +71,10 @@ const DatepickerBox = ({ title, icon, keyboard, onFocus = () => { { } } }) => {
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <DatePicker
-                            mode='calendar'                            
-                            onDateChange={selected=>setDate(selected)}
-                            minimumDate={startDate}      
-                            selected={getFormatedDate(new Date(), 'DD/MM/YYYY')}                                                
+                            mode='calendar'
+                            selected={date}
+                            onDateChange={(date)=>setDate(date)}
+                            minimumDate={startDate}
                         />
                         <TouchableOpacity onPress={handleOnPress}>                            
                             <Text style={{textAlign: 'center',}}>
