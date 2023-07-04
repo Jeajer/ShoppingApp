@@ -1,9 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/auth';
-import 'firebase/compat/firestore'
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -16,13 +13,6 @@ const firebaseConfig = {
     measurementId: "G-83LMFHM5GY"
 };
 
-const FIREBASE_APP = initializeApp(firebaseConfig);
-const FIREBASE_DB = getFirestore(FIREBASE_APP);
-const FIREBASE_PROVIDER = new GoogleAuthProvider();
-const FIREBASE_AUTH = getAuth(FIREBASE_APP);
-
-if(!firebase.apps.length){
-    firebase.initializeApp(firebaseConfig);
-}
-
-export { FIREBASE_AUTH, FIREBASE_PROVIDER, FIREBASE_DB, firebase };
+export const FIREBASE_APP = initializeApp(firebaseConfig);
+export const FIREBASE_DB = getFirestore(FIREBASE_APP);
+export const FIREBASE_AUTH = getAuth(FIREBASE_APP);

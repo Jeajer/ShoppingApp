@@ -8,7 +8,6 @@ import TabNavigator from "./TabNavigator";
 import OnboardingScreen from "../screens/OnboardingScreen";
 import CheckOutScreen from "../screens/CheckOutScreen";
 import SuccessOrderScreen from "../screens/SuccessOrderScreen";
-import ProductDetailScreen from "../screens/ProductDetailScreen";
 
 const Stack = createStackNavigator();
 

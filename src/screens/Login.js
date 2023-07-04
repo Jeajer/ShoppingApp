@@ -1,9 +1,8 @@
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState, Component } from 'react'
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import * as React from 'react'
+import Input from '../uc/Input'
+import PasswordBox from '../uc/PasswordBox'
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FIREBASE_AUTH, FIREBASE_PROVIDER } from '../../firebaseConfig';
-import { signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const img = "https://img.freepik.com/premium-vector/laptop-with-online-shop-where-catalog-clothes-shows-t-shirt-socks-shorts-blue_249405-51.jpg?w=1380"
 const fbImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png"
@@ -11,44 +10,7 @@ const ggImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_
 
 const Login = ({ navigation }) => {
 
-    const [toggleCheckBox, setToggleCheckBox] = useState(false)
-
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [loading, setLoading] = useState(false)
-    const [value, setValue] = useState('')
-    const [show, setShow] = React.useState(false);
-    const [visible, setVisible] = React.useState(true);
-
-    const auth = FIREBASE_AUTH
-
-    const [isFocused, setIsFocused] = React.useState(false);
-    const [isPassFocused, setIsPassFocused] = React.useState(false);
-
-    const handleClickGG = () => {
-        signInWithPopup(FIREBASE_AUTH, FIREBASE_PROVIDER)
-            .then((data) => {
-                setValue(data.user.email)
-                localStorage.setItem("email", data.user.email)
-            })
-    }
-
-    // useEffect(()=>{
-    //     setValue(localStorage.getItem('email'))
-    // })
-
-    const signIn = async () => {
-        setLoading(true);
-        try {
-            const response = await signInWithEmailAndPassword(auth, email, password);
-            console.log(response);
-        } catch (error) {
-            console.log(error);
-            alert('Sign in failed: ' + error.message);
-        } finally {
-            setLoading(false);
-        }
-    }
+    const [toggleCheckBox, setToggleCheckBox] = React.useState(false)
 
     return (
         <SafeAreaView style={{
@@ -73,7 +35,7 @@ const Login = ({ navigation }) => {
                                 width: 180,
                                 aspectRatio: 1,
                                 alignContent: "center",
-                                marginTop: 10,
+                                marginTop: -10,
                             }}
                             resizeMode="cover"
                         />
@@ -91,65 +53,17 @@ const Login = ({ navigation }) => {
                             Welcome back!
                         </Text>
 
-                        <View style={{ marginVertical: 10 }}>
-                            <Text style={styles.headerBox}>
-                                Email
-                            </Text>
-
-                            <View style={[styles.passwordContainer, { borderColor: isFocused ? "#1E1D2E" : "#EAEDFB" }]}>
-                                <TextInput placeholder="Enter your email"
-                                    placeholderTextColor='gray'
-                                    style={styles.input}
-                                    autoCapitalize='none'
-                                    onFocus={
-                                        () => {
-                                            // onFocus();
-                                            setIsFocused(true);
-                                        }}
-                                    onBlur={() => { setIsFocused(false) }}
-                                    keyboardType="email-address"
-                                    secureTextEntry='false'
-                                    onChangeText={(text) => setEmail(text)}
-                                    value={email}
-                                >
-                                </TextInput>
-                                <Icon name='email' size={20} color={isFocused ? "#1E1D2E" : "#B1B3CD"} />
-                            </View>
-                        </View>
-
-                        <View style={{ marginVertical: 10 }}>
-                            <Text style={styles.headerBox}>
-                                Password
-                            </Text>
-
-                            <View style={[styles.passwordContainer, { borderColor: isPassFocused ? "#1E1D2E" : "#EAEDFB" }]}>
-
-                                <TextInput placeholder='Enter your password'
-                                    placeholderTextColor='gray'
-                                    style={styles.input}
-                                    autoCapitalize='none'
-                                    onFocus={
-                                        () => {
-                                            setIsPassFocused(true);
-                                        }}
-                                    onBlur={() => { setIsPassFocused(false) }}
-                                    keyboardType='default'
-                                    secureTextEntry={visible}
-                                    onChangeText={(text) => setPassword(text)}
-                                    value={password}
-                                >
-                                </TextInput>
-                                <TouchableOpacity style={styles.searchIcon} onPress={
-                                    () => {
-                                        setShow(!show)
-                                        setVisible(!visible)
-                                    }
-                                }>
-                                    <Icon name={show === false ? 'eye-outline' : 'eye-off-outline'} size={20} color={isPassFocused ? "#1E1D2E" : "#B1B3CD"} />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-
+                        <Input
+                            title='E-mail address'
+                            icon='email-outline'
+                            placeholder='Enter your e-mail address'
+                            keyboard='default'
+                        />
+                        <PasswordBox
+                            title='Password'
+                            placeholder='Enter your password'
+                            keyboard='default'
+                        />
                     </View>
 
                     <TouchableOpacity
@@ -171,7 +85,7 @@ const Login = ({ navigation }) => {
 
                     <View style={styles.loginMethodLayout}>
                         <TouchableOpacity
-                            onPress={handleClickGG}
+                            onPress={() => { }}
                             style={styles.loginMethod}
                         >
                             <Image
@@ -201,42 +115,31 @@ const Login = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
 
-                    {loading ? 
-                    (<ActivityIndicator 
-                            size='large' 
-                            color='#0000ff' 
-                            style={{ marginTop: 50, marginBottom: 20, }}
-                        />)
-                        : (
-                            <>
-                                <TouchableOpacity
-                                    onPress={signIn}
-                                    style={{
-                                        backgroundColor: '#1E1D2E',
-                                        marginTop: 50,
-                                        padding: 15,
-                                        borderRadius: 10,
-                                        marginBottom: 20,
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <Text style={{
-                                        fontWeight: '700',
-                                        fontSize: 16,
-                                        color: '#fff'
-                                    }}>
-                                        Login
-                                    </Text>
-                                </TouchableOpacity>
-                            </>)
-                    }
-
+                    <TouchableOpacity
+                        onPress={() => { }}
+                        style={{
+                            backgroundColor: '#1E1D2E',
+                            marginTop: 50,
+                            padding: 15,
+                            borderRadius: 10,
+                            marginBottom: 20,
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Text style={{
+                            fontWeight: '700',
+                            fontSize: 16,
+                            color: '#fff'
+                        }}>
+                            Login
+                        </Text>
+                    </TouchableOpacity>
 
                     <View style={{
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginBottom: 20,
+                        marginBottom: 40,
                     }}>
                         <Text style={{
                             textAlign: 'center',
@@ -293,43 +196,11 @@ const styles = StyleSheet.create({
         padding: 15,
         alignItems: 'center',
         backgroundColor: '#F9F9FD',
-        alignContent: 'space-between',
+        marginEnd: 15,
     },
     loginMethodLayout: {
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 20,
-        marginHorizontal: 100,
-    },
-    input: {
-        backgroundColor: "transparent",
-        paddingVertical: 10,
-        paddingHorizontal: 0,
-        fontSize: 16,
-        width: '90%',
-    },
-    passwordContainer: {
-        flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F9F9FD',
-        height: 50,
-        borderRadius: 10,
-        marginTop: 5,
-        paddingHorizontal: 10,
-        borderWidth: 2,
-    },
-    searchIcon: {
-        paddingStart: 0,
-        marginEnd: 0,
-    },
-    inputStyle: {
-        flex: 1,
-    },
-    headerBox: {
-        color: "gray",
-        fontWeight: 'normal',
-        fontSize: 12
-    }, 
+        marginTop: 20,
+    }
 }) 
