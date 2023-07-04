@@ -208,28 +208,46 @@ const Login = ({ navigation }) => {
                         />)
                         : (
                             <>
-                                <TouchableOpacity
-                                    onPress={signIn}
-                                    style={{
-                                        backgroundColor: '#1E1D2E',
-                                        marginTop: 50,
-                                        padding: 15,
-                                        borderRadius: 10,
-                                        marginBottom: 20,
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <Text style={{
-                                        fontWeight: '700',
-                                        fontSize: 16,
-                                        color: '#fff'
-                                    }}>
-                                        Login
-                                    </Text>
-                                </TouchableOpacity>
+                           <TouchableOpacity
+                        onPress={() => {navigation.navigate("Profile1 Screen") }}
+                        style={{
+                            backgroundColor: '#1E1D2E',
+                            marginTop: 50,
+                            padding: 15,
+                            borderRadius: 10,
+                            marginBottom: 20,
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Text style={{
+                            fontWeight: '700',
+                            fontSize: 16,
+                            color: '#fff'
+                        }}>
+                            Login
+                        </Text>
+                    </TouchableOpacity>
+//                                 <TouchableOpacity
+//                                     onPress={signIn}
+//                                     style={{
+//                                         backgroundColor: '#1E1D2E',
+//                                         marginTop: 50,
+//                                         padding: 15,
+//                                         borderRadius: 10,
+//                                         marginBottom: 20,
+//                                         alignItems: 'center',
+//                                     }}
+//                                 >
+//                                     <Text style={{
+//                                         fontWeight: '700',
+//                                         fontSize: 16,
+//                                         color: '#fff'
+//                                     }}>
+//                                         Login
+//                                     </Text>
+//                                 </TouchableOpacity>
                             </>)
                     }
-
 
                     <View style={{
                         flexDirection: 'row',
