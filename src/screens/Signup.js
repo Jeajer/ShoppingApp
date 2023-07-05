@@ -1,7 +1,21 @@
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native'
-import React, {useState} from 'react'
-import Input from '../uc/Input'
-import PasswordBox from '../uc/PasswordBox'
+import {
+    View,
+    Text,
+    Image,
+    StyleSheet,
+    ScrollView,
+    TouchableOpacity,
+    SafeAreaView,
+    TextInput,
+    ActivityIndicator,
+    ToastAndroid,
+} from 'react-native'
+import React, { useState } from 'react'
+import { FIREBASE_AUTH, FIREBASE_PROVIDER, FIREBASE_DB } from '../../firebaseConfig';
+import { signInWithPopup, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import firebase from '../../firebaseConfig';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { CreateUserWithEmailAndPassword } from '../utilities/Utilities';
 
 const img = "https://img.freepik.com/premium-vector/shopping-cart-with-gift-boxes-shopping-bags-from-online-shop-e-commerce-marketing-provided-with-sale-discount-blue_249405-55.jpg?w=1060"
 const fbImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png"
@@ -9,7 +23,92 @@ const ggImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_
 
 const Signup = ({ navigation }) => {
 
-    const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [cpassword, setCPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastname, setLastName] = useState('');
+    const [show, setShow] = React.useState(false);
+    const [visible, setVisible] = React.useState(true);
+    const [cshow, setCShow] = React.useState(false);
+    const [cvisible, setCVisible] = React.useState(true);
+    const [loading, setLoading] = useState(false)
+
+    const auth = FIREBASE_AUTH
+
+    const [isFocused, setIsFocused] = React.useState(false);
+    const [isFNameFocused, setIsFNameFocused] = React.useState(false);
+    const [isLNameFocused, setIsLNameFocused] = React.useState(false);
+    const [isPassFocused, setIsPassFocused] = React.useState(false);
+    const [isCPassFocused, setIsCPassFocused] = React.useState(false);
+    const [errors, setErros] = useState({})
+    const [showErrors, setShowErros] = useState(false)
+
+    const getErrors = (email, password, cpassword, firstName, lastname) => {
+        const errors = {};
+        if (!email) {
+            errors.email = 'Please enter email!';
+        } else if (!email.includes('@') || !email.includes('.com')) {
+            errors.email = 'Please valid email';
+        }
+
+        if (!firstName) {
+            errors.firstName = 'Please enter first name!';
+        }
+
+        if (!lastname) {
+            errors.lastname = 'Please enter last name!';
+        }
+
+        if (!password) {
+            errors.password = 'Please enter password!';
+        } else if (password.length < 6) {
+            errors.password = 'Enter password of 6 characters';
+        }
+
+        if (!cpassword) {
+            errors.cpassword = 'Please enter confirm password!'
+        } else if (cpassword.length < 6) {
+            errors.cpassword = 'Enter password of 6 characters';
+        } else if (password !== cpassword) {
+            errors.cpassword = 'Password and Confirm Password does not match';
+        }
+
+        return errors;
+    };
+
+    const firebasestore = FIREBASE_DB;
+
+    registerUser = async (email, password, cpassword, firstName, lastname) => {
+        // setLoading(true);
+        const errors = getErrors(email, password, cpassword, firstName, lastname);
+        if (Object.keys(errors).length > 0) {
+            setShowErros(true);
+            setErros(errors)
+            console.log(errors)
+        } else {
+            setShowErros(false);
+            setErros(errors)
+            handleSignIn(email, password)
+        }
+    }
+
+    const handleSignIn = (email, password) => {
+        setLoading(true)
+        createUserWithEmailAndPassword(auth, email, password)
+            .then(() => {
+                ToastAndroid.show("Sign Up Success", ToastAndroid.SHORT);
+                setLoading(false)
+            }).catch((error) => {
+                if (error.code === 'auth/email-already-in-use'){
+                    alert('User is already existed');
+                    errors.email = 'User is already existed';
+                    setErros(errors)
+                }
+                console.log(error.code);
+                setLoading(false)
+            })
+    }
 
     return (
         <SafeAreaView style={{
@@ -52,46 +151,181 @@ const Signup = ({ navigation }) => {
                             Become a member!
                         </Text>
 
-                        <Input
-                            title='Fullname'
-                            icon='account-outline'
-                            placeholder='Enter your fullname'
-                            keyboard='default'
-                        />
+                        {/* first name box */}
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.headerBox}>
+                                Firt name
+                            </Text>
 
-                        <Input
-                            title='E-mail address'
-                            icon='email-outline'
-                            placeholder='Enter your e-mail address'
-                            keyboard='default'
-                        />
+                            <View style={[styles.passwordContainer, { borderColor: isFNameFocused ? "#1E1D2E" : "#EAEDFB" }]}>
+                                <TextInput placeholder="Enter your first name"
+                                    placeholderTextColor='gray'
+                                    style={styles.input}
+                                    autoCapitalize='none'
+                                    onFocus={
+                                        () => {
+                                            // onFocus();
+                                            setIsFNameFocused(true);
+                                        }}
+                                    onBlur={() => { setIsFNameFocused(false) }}
+                                    keyboardType="default"
+                                    onChangeText={(text) => setFirstName(text)}
+                                    value={firstName}
+                                >
+                                </TextInput>
+                                <Icon name='account-outline' size={20} color={isFNameFocused ? "#1E1D2E" : "#B1B3CD"} />
+                            </View>
 
-                        <PasswordBox
-                            title='Password'
-                            placeholder='Enter your password'
-                            keyboard='default'
-                        />
+                            {errors.firstName && (
+                                <Text style={styles.errorText}>
+                                    *{errors.firstName}
+                                </Text>
+                            )}
 
-                        <PasswordBox
-                            title='Confirm password'
-                            placeholder='Enter your password again'
-                            keyboard='default'
-                        />
-                        
+                        </View>
+
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.headerBox}>
+                                Last name
+                            </Text>
+
+                            <View style={[styles.passwordContainer, { borderColor: isLNameFocused ? "#1E1D2E" : "#EAEDFB" }]}>
+                                <TextInput placeholder="Enter your last name"
+                                    placeholderTextColor='gray'
+                                    style={styles.input}
+                                    autoCapitalize='words'
+                                    onFocus={
+                                        () => {
+                                            // onFocus();
+                                            setIsLNameFocused(true);
+                                        }}
+                                    onBlur={() => { setIsLNameFocused(false) }}
+                                    keyboardType="default"
+                                    onChangeText={(text) => setLastName(text)}
+                                    value={lastname}
+                                >
+                                </TextInput>
+                                <Icon name='account-outline' size={20} color={isFocused ? "#1E1D2E" : "#B1B3CD"} />
+                            </View>
+                            {errors.lastname && (
+                                <Text style={styles.errorText}>
+                                    *{errors.lastname}
+                                </Text>
+                            )}
+                        </View>
+
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.headerBox}>
+                                Email
+                            </Text>
+
+                            <View style={[styles.passwordContainer, { borderColor: isFocused ? "#1E1D2E" : "#EAEDFB" }]}>
+                                <TextInput placeholder="Enter your email"
+                                    placeholderTextColor='gray'
+                                    style={styles.input}
+                                    autoCapitalize='none'
+                                    onFocus={
+                                        () => {
+                                            // onFocus();
+                                            setIsFocused(true);
+                                        }}
+                                    onBlur={() => { setIsFocused(false) }}
+                                    keyboardType="email-address"
+                                    onChangeText={(text) => setEmail(text)}
+                                    value={email}
+                                >
+                                </TextInput>
+                                <Icon name='email' size={20} color={isFocused ? "#1E1D2E" : "#B1B3CD"} />
+                            </View>
+                            {errors.email && (
+                                <Text style={styles.errorText}>
+                                    *{errors.email}
+                                </Text>
+                            )}
+                        </View>
+
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.headerBox}>
+                                Password
+                            </Text>
+
+                            <View style={[styles.passwordContainer, { borderColor: isPassFocused ? "#1E1D2E" : "#EAEDFB" }]}>
+
+                                <TextInput placeholder='Enter your password'
+                                    placeholderTextColor='gray'
+                                    style={styles.input}
+                                    autoCapitalize='none'
+                                    onFocus={
+                                        () => {
+                                            setIsPassFocused(true);
+                                        }}
+                                    onBlur={() => { setIsPassFocused(false) }}
+                                    keyboardType='default'
+                                    secureTextEntry={visible}
+                                    onChangeText={(text) => setPassword(text)}
+                                    value={password}
+                                >
+                                </TextInput>
+                                <TouchableOpacity style={styles.searchIcon} onPress={
+                                    () => {
+                                        setShow(!show)
+                                        setVisible(!visible)
+                                    }
+                                }>
+                                    <Icon name={show === false ? 'eye-outline' : 'eye-off-outline'} size={20} color={isPassFocused ? "#1E1D2E" : "#B1B3CD"} />
+                                </TouchableOpacity>
+                            </View>
+                            {errors.password && (
+                                <Text style={styles.errorText}>
+                                    *{errors.password}
+                                </Text>
+                            )}
+                        </View>
+
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.headerBox}>
+                                Confirm password
+                            </Text>
+
+                            <View style={[styles.passwordContainer, { borderColor: isCPassFocused ? "#1E1D2E" : "#EAEDFB" }]}>
+
+                                <TextInput placeholder='Enter your password again'
+                                    placeholderTextColor='gray'
+                                    style={styles.input}
+                                    autoCapitalize='none'
+                                    onFocus={
+                                        () => {
+                                            setIsCPassFocused(true);
+                                        }}
+                                    onBlur={() => { setIsCPassFocused(false) }}
+                                    keyboardType='default'
+                                    secureTextEntry={cvisible}
+                                    onChangeText={(text) => setCPassword(text)}
+                                    value={cpassword}
+                                >
+                                </TextInput>
+                                <TouchableOpacity style={styles.searchIcon} onPress={
+                                    () => {
+                                        setCShow(!cshow)
+                                        setCVisible(!cvisible)
+                                    }
+                                }>
+                                    <Icon name={cshow === false ? 'eye-outline' : 'eye-off-outline'} size={20} color={isCPassFocused ? "#1E1D2E" : "#B1B3CD"} />
+                                </TouchableOpacity>
+                            </View>
+                            {errors.cpassword && (
+                                <Text style={styles.errorText}>
+                                    *{errors.cpassword}
+                                </Text>
+                            )}
+                        </View>
+
                     </View>
-
-                    <TouchableOpacity
-                        onPress={() => { }}
-                        style={{}}>
-                        <Text style={styles.forgot}>
-                            Forgot password?
-                        </Text>
-                    </TouchableOpacity>
 
                     <Text style={{
                         color: 'gray',
                         fontSize: 13,
-                        marginTop: 30,
+                        marginTop: 10,
                         textAlign: 'center',
                     }}>
                         Or, login with...
@@ -129,31 +363,41 @@ const Signup = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity
-                        onPress={() => { }}
-                        style={{
-                            backgroundColor: '#1E1D2E',
-                            marginTop: 50,
-                            padding: 15,
-                            borderRadius: 10,
-                            marginBottom: 20,
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Text style={{
-                            fontWeight: '700',
-                            fontSize: 16,
-                            color: '#fff'
-                        }}>
-                            Login
-                        </Text>
-                    </TouchableOpacity>
+                    {loading ?
+                        (<ActivityIndicator
+                            size='large'
+                            color='#0000ff'
+                            style={{ marginTop: 50, marginBottom: 20, padding: 5.5, }}
+                        />)
+                        : (
+                            <>
+                                <TouchableOpacity
+                                    onPress={() => registerUser(email, password, cpassword, firstName, lastname)}
+                                    style={{
+                                        backgroundColor: '#1E1D2E',
+                                        marginTop: 50,
+                                        padding: 15,
+                                        borderRadius: 10,
+                                        marginBottom: 20,
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Text style={{
+                                        fontWeight: '700',
+                                        fontSize: 16,
+                                        color: '#fff'
+                                    }}>
+                                        Signup
+                                    </Text>
+                                </TouchableOpacity>
+                            </>)
+                    }
 
                     <View style={{
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginBottom: 40,
+                        marginBottom: 60,
                     }}>
                         <Text style={{
                             textAlign: 'center',
@@ -180,7 +424,7 @@ const Signup = ({ navigation }) => {
                     </View>
                 </View>
             </ScrollView>
-            
+
         </SafeAreaView>
     )
 }
@@ -216,5 +460,40 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         marginTop: 20,
-    }
+    },
+    input: {
+        backgroundColor: "transparent",
+        paddingVertical: 10,
+        paddingHorizontal: 0,
+        fontSize: 16,
+        width: '90%',
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F9F9FD',
+        height: 50,
+        borderRadius: 10,
+        marginTop: 5,
+        paddingHorizontal: 10,
+        borderWidth: 2,
+    },
+    searchIcon: {
+        paddingStart: 0,
+        marginEnd: 0,
+    },
+    inputStyle: {
+        flex: 1,
+    },
+    headerBox: {
+        color: "gray",
+        fontWeight: 'normal',
+        fontSize: 12
+    },
+    errorText: {
+        fontSize: 12,
+        color: 'red',
+        fontStyle: 'italic'
+    },
 }) 

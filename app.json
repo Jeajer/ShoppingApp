@@ -1,7 +1,6 @@
 {
   "expo": {
     "jsEngine": "hermes",
-      
     "name": "ShoppingApp",
     "slug": "ShoppingApp",
     "version": "1.0.0",
@@ -18,16 +17,23 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "jsEngine": "jsc"
+      "jsEngine": "jsc",
+      "bundleIdentifier": "com.manhmeow20520630.ShoppingApp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.manhmeow20520630.ShoppingApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7c189c27-440a-4fc1-8b36-023e0cd7e4b2"
+      }
     }
   }
 }
