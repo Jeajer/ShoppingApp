@@ -83,6 +83,7 @@ import {
               alignItems: "center",
           }}>
             <TouchableOpacity 
+              onPress={() => navigation.navigate("Detail Order Screen")}
               style={{
                 alignItems: "center", 
                 backgroundColor: colors.text, 
@@ -114,12 +115,7 @@ import {
             renderItem={({item, index}) => {
             return (
                 <View>
-                    <TouchableOpacity 
-                        onPress={() => {
-                            navigation.navigate(item.screen);
-                          }}>
-                        <RenderItem item={item} index={index}/>
-                    </TouchableOpacity>
+                    <RenderItem item={item} index={index}/>
                 </View>
             )}}/>
       </View>

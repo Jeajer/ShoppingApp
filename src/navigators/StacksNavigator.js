@@ -15,6 +15,8 @@ import OrderScreen from "../screens/OrderScreen";
 import AddressScreen from "../screens/AddressScreen";
 import AddAddressScreen from "../screens/AddAddressScreen";
 import AccountScreen from "../screens/AccountScreen";
+import SecondhandScreen from "../screens/SecondhandScreen";
+import DetailOrderScreen from "../screens/DetailOrderScreen";
 
 const Stack = createStackNavigator();
 
@@ -43,6 +45,8 @@ const StacksNavigator = () => {
       <Stack.Screen name="Address Screen" component={AddressScreen} />
       <Stack.Screen name="Add Address Screen" component={AddAddressScreen} />
       <Stack.Screen name="Account Screen" component={AccountScreen} />
+      <Stack.Screen name="Secondhand Screen" component={SecondhandScreen} />
+      <Stack.Screen name="Detail Order Screen" component={DetailOrderScreen} />
     </Stack.Navigator>
   );
 }
