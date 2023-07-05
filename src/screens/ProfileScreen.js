@@ -33,6 +33,11 @@ const GENERAL_LIST = [
         screen: "Order Screen",
     },
     {
+      icon: "post",
+      title: "My posts",
+      screen: "Secondhand Screen",
+    },
+    {
         icon: "cart",
         title: "Cart",
         screen: "Cart Screen",
@@ -144,7 +149,7 @@ const ProfileScreen = ({navigation}) => {
         <FlatList 
             contentContainerStyle={{
                 paddingHorizontal: 24,
-                gap: 24,
+                gap: 18,
               }}
             data={GENERAL_LIST}
             renderItem={({item, index}) => {
@@ -156,7 +161,7 @@ const ProfileScreen = ({navigation}) => {
                           }}>
                         <RenderItem item={item} index={index}/>
                     </TouchableOpacity>
-                    <View style={{height: 1, backgroundColor: colors.border, marginTop: 24}}/>
+                    <View style={{height: 1, backgroundColor: colors.border, marginTop: 18}}/>
                 </View>
             )
         }}/>
@@ -179,7 +184,7 @@ const ProfileScreen = ({navigation}) => {
         <FlatList 
             contentContainerStyle={{
                 paddingHorizontal: 24,
-                gap: 24,
+                gap: 18,
               }}
             data={SUPPORT_LIST}
             renderItem={({item, index}) => {
@@ -188,7 +193,7 @@ const ProfileScreen = ({navigation}) => {
                     <TouchableOpacity>
                         <RenderItem item={item} index={index}/>
                     </TouchableOpacity>
-                    <View style={{height: 1, backgroundColor: colors.border, marginTop: 24}}/>
+                    <View style={{height: 1, backgroundColor: colors.border, marginTop: 18}}/>
                 </View>
             )
         }}/>
