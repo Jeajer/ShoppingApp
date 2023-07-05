@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FIREBASE_AUTH, FIREBASE_PROVIDER } from '../../firebaseConfig';
 import { signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { SignInWithGoogle } from '../utilities/Utilities';
 
 const img = "https://img.freepik.com/premium-vector/laptop-with-online-shop-where-catalog-clothes-shows-t-shirt-socks-shorts-blue_249405-51.jpg?w=1380"
 const fbImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png"
@@ -19,6 +20,7 @@ const Login = ({ navigation }) => {
     const [value, setValue] = useState('')
     const [show, setShow] = React.useState(false);
     const [visible, setVisible] = React.useState(true);
+    const inputRef = React.useRef(null);
 
     const auth = FIREBASE_AUTH
 
@@ -37,14 +39,50 @@ const Login = ({ navigation }) => {
     //     setValue(localStorage.getItem('email'))
     // })
 
-    const signIn = async () => {
+    const [errors, setErros] = useState({})
+    const [showErrors, setShowErros] = useState(false)
+
+    const getErrors = (email, password, cpassword, firstName, lastname) => {
+        const errors = {};
+        if (!email) {
+            errors.email = 'Please enter email!';
+        } else if (!email.includes('@') || !email.includes('.com')) {
+            errors.email = 'Please valid email';
+        }
+
+        if (!password) {
+            errors.password = 'Please enter password!';
+        } else if (password.length < 6) {
+            errors.password = 'Enter password of 6 characters';
+        }
+
+        return errors;
+    };
+
+    handleSignIn = async (email, password) => {
+        // setLoading(true);
+        const errors = getErrors(email, password);
+        if (Object.keys(errors).length > 0) {
+            setShowErros(true);
+            setErros(errors)
+            console.log(errors)
+        } else {
+            setShowErros(false);
+            setErros(errors)
+            signIn(email, password)
+        }
+    }
+
+    const signIn = async (email, password) => {
         setLoading(true);
         try {
             const response = await signInWithEmailAndPassword(auth, email, password);
             console.log(response);
         } catch (error) {
+            if (error.code === 'auth/user-not-found'){
+                alert('User not found');
+            }
             console.log(error);
-            alert('Sign in failed: ' + error.message);
         } finally {
             setLoading(false);
         }
@@ -112,8 +150,13 @@ const Login = ({ navigation }) => {
                                     value={email}
                                 >
                                 </TextInput>
-                                <Icon name='email' size={20} color={isFocused ? "#1E1D2E" : "#B1B3CD"} />
+                                <Icon name='email-outline' size={20} color={isFocused ? "#1E1D2E" : "#B1B3CD"} />
                             </View>
+                            {errors.email && (
+                                <Text style={styles.errorText}>
+                                    *{errors.email}
+                                </Text>
+                            )}
                         </View>
 
                         <View style={{ marginVertical: 10 }}>
@@ -147,6 +190,11 @@ const Login = ({ navigation }) => {
                                     <Icon name={show === false ? 'eye-outline' : 'eye-off-outline'} size={20} color={isPassFocused ? "#1E1D2E" : "#B1B3CD"} />
                                 </TouchableOpacity>
                             </View>
+                            {errors.password && (
+                                <Text style={styles.errorText}>
+                                    *{errors.password}
+                                </Text>
+                            )}
                         </View>
 
                     </View>
@@ -170,7 +218,7 @@ const Login = ({ navigation }) => {
 
                     <View style={styles.loginMethodLayout}>
                         <TouchableOpacity
-                            onPress={handleClickGG}
+                            onPress={() => {}}
                             style={styles.loginMethod}
                         >
                             <Image
@@ -204,48 +252,29 @@ const Login = ({ navigation }) => {
                         (<ActivityIndicator
                             size='large'
                             color='#0000ff'
-                            style={{ marginTop: 50, marginBottom: 20, }}
+                            style={{ marginTop: 50, marginBottom: 20, padding: 5.5, }}
                         />)
                         : (
-                            <>
-                           <TouchableOpacity
-                        onPress={() => {navigation.navigate("Profile1 Screen") }}
-                        style={{
-                            backgroundColor: '#1E1D2E',
-                            marginTop: 50,
-                            padding: 15,
-                            borderRadius: 10,
-                            marginBottom: 20,
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Text style={{
-                            fontWeight: '700',
-                            fontSize: 16,
-                            color: '#fff'
-                        }}>
-                            Login
-                        </Text>
-                    </TouchableOpacity>
-//                                 <TouchableOpacity
-//                                     onPress={signIn}
-//                                     style={{
-//                                         backgroundColor: '#1E1D2E',
-//                                         marginTop: 50,
-//                                         padding: 15,
-//                                         borderRadius: 10,
-//                                         marginBottom: 20,
-//                                         alignItems: 'center',
-//                                     }}
-//                                 >
-//                                     <Text style={{
-//                                         fontWeight: '700',
-//                                         fontSize: 16,
-//                                         color: '#fff'
-//                                     }}>
-//                                         Login
-//                                     </Text>
-//                                 </TouchableOpacity>
+                            <>                                
+                                <TouchableOpacity
+                                    onPress={() => handleSignIn(email, password)}
+                                    style={{
+                                        backgroundColor: '#1E1D2E',
+                                        marginTop: 50,
+                                        padding: 15,
+                                        borderRadius: 10,
+                                        marginBottom: 20,
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Text style={{
+                                        fontWeight: '700',
+                                        fontSize: 16,
+                                        color: '#fff'
+                                    }}>
+                                        Login
+                                    </Text>
+                                </TouchableOpacity>
                             </>)
                     }
 
@@ -348,5 +377,10 @@ const styles = StyleSheet.create({
         color: "gray",
         fontWeight: 'normal',
         fontSize: 12
+    },
+    errorText: {
+        fontSize: 12,
+        color: 'red',
+        fontStyle: 'italic'
     },
 }) 
