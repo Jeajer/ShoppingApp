@@ -2,7 +2,7 @@ import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, TextInput,
 import React, { useEffect, useState, Component } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FIREBASE_AUTH, FIREBASE_PROVIDER } from '../../firebaseConfig';
-import { signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithPopup, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { SignInWithGoogle } from '../utilities/Utilities';
 
@@ -26,6 +26,7 @@ const Login = ({ navigation }) => {
 
     const [isFocused, setIsFocused] = React.useState(false);
     const [isPassFocused, setIsPassFocused] = React.useState(false);
+    
 
     const handleClickGG = () => {
         signInWithPopup(FIREBASE_AUTH, FIREBASE_PROVIDER)
@@ -41,6 +42,7 @@ const Login = ({ navigation }) => {
 
     const [errors, setErros] = useState({})
     const [showErrors, setShowErros] = useState(false)
+    
 
     const getErrors = (email, password, cpassword, firstName, lastname) => {
         const errors = {};
@@ -81,6 +83,13 @@ const Login = ({ navigation }) => {
         } catch (error) {
             if (error.code === 'auth/user-not-found'){
                 alert('User not found');
+                errors.email = 'User not found'
+                setErros(errors)
+            }
+            if (error.code === 'auth/wrong-password') {
+                alert('Wrong password');
+                errors.password = 'Wrong password'
+                setErros(errors)
             }
             console.log(error);
         } finally {
@@ -200,7 +209,7 @@ const Login = ({ navigation }) => {
                     </View>
 
                     <TouchableOpacity
-                        onPress={() => { }}
+                        onPress={() => navigation.navigate('Reset Password Screen')}
                         style={{}}>
                         <Text style={styles.forgot}>
                             Forgot password?
@@ -218,7 +227,7 @@ const Login = ({ navigation }) => {
 
                     <View style={styles.loginMethodLayout}>
                         <TouchableOpacity
-                            onPress={() => {}}
+                            onPress={() => SignInWithGoogle()}
                             style={styles.loginMethod}
                         >
                             <Image

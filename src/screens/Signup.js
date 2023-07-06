@@ -12,10 +12,9 @@ import {
 } from 'react-native'
 import React, { useState } from 'react'
 import { FIREBASE_AUTH, FIREBASE_PROVIDER, FIREBASE_DB } from '../../firebaseConfig';
-import { signInWithPopup, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { updateProfile, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import firebase from '../../firebaseConfig';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { CreateUserWithEmailAndPassword } from '../utilities/Utilities';
 
 const img = "https://img.freepik.com/premium-vector/shopping-cart-with-gift-boxes-shopping-bags-from-online-shop-e-commerce-marketing-provided-with-sale-discount-blue_249405-55.jpg?w=1060"
 const fbImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png"
@@ -35,6 +34,7 @@ const Signup = ({ navigation }) => {
     const [loading, setLoading] = useState(false)
 
     const auth = FIREBASE_AUTH
+    const user = FIREBASE_AUTH.currentUser
 
     const [isFocused, setIsFocused] = React.useState(false);
     const [isFNameFocused, setIsFNameFocused] = React.useState(false);
@@ -93,14 +93,34 @@ const Signup = ({ navigation }) => {
         }
     }
 
-    const handleSignIn = (email, password) => {
+    const data = {
+        firstName: firstName,
+        lastName: lastname,
+        address: '',
+        email: email,
+        id: '',        
+    };
+
+    const handleSignIn = async (email, password) => {
         setLoading(true)
         createUserWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                ToastAndroid.show("Sign Up Success", ToastAndroid.SHORT);
-                setLoading(false)
+            .then(async () => {
+                updateProfile(FIREBASE_AUTH.currentUser, {
+                    displayName: firstName + lastname,
+                }).then(() => {
+                    console.log(user.displayName)
+                }).catch((error) => {
+                    console.log(error.message)
+                });
+                
+                try { 
+                    const res = await FIREBASE_DB.collection('cities').doc('LA').set(data);
+                    console.log(res);
+                } catch(error) {
+                    
+                }
             }).catch((error) => {
-                if (error.code === 'auth/email-already-in-use'){
+                if (error.code === 'auth/email-already-in-use') {
                     alert('User is already existed');
                     errors.email = 'User is already existed';
                     setErros(errors)
@@ -108,6 +128,7 @@ const Signup = ({ navigation }) => {
                 console.log(error.code);
                 setLoading(false)
             })
+        setLoading(false);
     }
 
     return (

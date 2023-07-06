@@ -3,6 +3,7 @@ package com.manhmeow20520630.ShoppingApp;
 import android.app.Application;
 import android.content.res.Configuration;
 import androidx.annotation.NonNull;
+import com.facebook.reactnative.androidsdk.FBSDKPackage;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -25,6 +26,8 @@ public class MainApplication extends Application implements ReactApplication {
       public boolean getUseDeveloperSupport() {
         return BuildConfig.DEBUG;
       }
+
+      
 
       @Override
       protected List<ReactPackage> getPackages() {
@@ -50,6 +53,14 @@ public class MainApplication extends Application implements ReactApplication {
         return BuildConfig.IS_HERMES_ENABLED;
       }
   });
+
+  @Override
+  protected List<ReactPackage> getPackages() {
+    return Arrays.asList(
+            new MainReactPackage(),
+            new FBSDKPackage()
+    );
+}
 
   @Override
   public ReactNativeHost getReactNativeHost() {

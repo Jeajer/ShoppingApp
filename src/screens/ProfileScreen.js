@@ -20,12 +20,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MasonryList from '@react-native-seoul/masonry-list';
-import { BlurView } from 'expo-blur';
-import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import CustomBackdrop from "../components/CustomBackdrop";
-import FilterView from "../components/FilterView";
 import { SignOutUser } from '../utilities/Utilities';
+import { FIREBASE_AUTH } from "../../firebaseConfig";
 
 const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg";
 
@@ -59,6 +55,9 @@ const SUPPORT_LIST = [
   },
 ];
 
+const user = FIREBASE_AUTH.currentUser;
+const displayName = '';
+
 const ProfileScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
@@ -84,7 +83,7 @@ const ProfileScreen = ({ navigation }) => {
   }
 
   const handleSignOut = () => {
-    try{
+    try {
       SignOutUser();
       console.log('signed out!')
     } catch (error) {
@@ -93,9 +92,11 @@ const ProfileScreen = ({ navigation }) => {
   }
 
   return (
+    <ScrollView>
     <SafeAreaView style={{
       paddingVertical: 24,
       gap: 30,
+      backgroundColor: 'white',
     }}>
       <View style={{
         paddingHorizontal: 24,
@@ -109,7 +110,7 @@ const ProfileScreen = ({ navigation }) => {
           fontWeight: "700",
         }}>Profile</Text>
         <TouchableOpacity
-          onPress={() => {handleSignOut()}}
+          onPress={() => { handleSignOut() }}
         >
           <Icon name='logout' size={30} color="#000" />
         </TouchableOpacity>
@@ -130,11 +131,11 @@ const ProfileScreen = ({ navigation }) => {
             resizeMode="cover" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 6, color: colors.text }}>
-              Hi, James 👋
+              Hi, {displayName ? displayName : "Anonymous User"} 👋
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>
-              James@gmail.com
+              {user.email}
             </Text>
           </View>
           <Icon name="chevron-right" size={30} color={colors.text} />
@@ -153,7 +154,7 @@ const ProfileScreen = ({ navigation }) => {
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
-        marginTop: -10,
+        marginTop: 20,
       }}>
         <FlatList
           contentContainerStyle={{
@@ -188,7 +189,7 @@ const ProfileScreen = ({ navigation }) => {
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
-        marginTop: -10,
+        marginTop: 20,
       }}>
         <FlatList
           contentContainerStyle={{
@@ -208,7 +209,9 @@ const ProfileScreen = ({ navigation }) => {
           }} />
       </View>
 
+
     </SafeAreaView>
+    </ScrollView>
   );
 };
 

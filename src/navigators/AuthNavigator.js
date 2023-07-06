@@ -4,7 +4,6 @@ import Login from "../screens/Login";
 import Signup from "../screens/Signup";
 import ProfileScreen from "../screens/ProfileScreen";
 import { FIREBASE_AUTH } from "../../firebaseConfig";
-import { onAuthStateChanged } from "firebase/auth";
 
 
 const Stack = createStackNavigator();
@@ -48,22 +47,5 @@ const ProfileNavigator = () => {
         </Stack.Navigator>
     );
 }
-
-// const CartStackNavigator = () => {
-//   return (
-//     <Stack.Navigator screenOptions={{headerShown: false}}>
-//       <Stack.Screen name="Cart Screen" component={CartScreen} />
-//     </Stack.Navigator>
-//   );
-// }
-
-// const FirstStackNavigator = () => {
-//   return (
-//     <Stack.Navigator screenOptions={{headerShown: false}}>
-//       <Stack.Screen name="Login Screen" component={Login} />
-//       <Stack.Screen name="Signup Screen" component={Signup} />
-//     </Stack.Navigator>
-//   )
-// }
 
 export default ProfileNavigator;
