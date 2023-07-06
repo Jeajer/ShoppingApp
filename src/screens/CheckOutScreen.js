@@ -231,7 +231,7 @@ const CheckOutScreen = ({navigation}) => {
             fontWeight: "600",
             color: "red",
           }}>
-            ${(768000).toLocaleString()}
+            ${(640000).toLocaleString()}
           </Text>
         </View>
 

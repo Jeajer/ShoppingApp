@@ -142,7 +142,7 @@ const AccountScreen = ({navigation}) => {
                         color: colors.background,
                       }}
                     >
-                      Add new address
+                      Save Information
                     </Text>
       
                     <View
