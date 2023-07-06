@@ -79,7 +79,7 @@ const Login = ({ navigation }) => {
         setLoading(true);
         try {
             const response = await signInWithEmailAndPassword(auth, email, password);
-            console.log(response);
+            
         } catch (error) {
             if (error.code === 'auth/user-not-found'){
                 alert('User not found');
@@ -99,13 +99,14 @@ const Login = ({ navigation }) => {
 
     return (
         <SafeAreaView style={{
-            backgroundColor: "white",
+            backgroundColor: 'white',
             flex: 1,
 
         }}>
             <ScrollView
                 style={{
                     paddingHorizontal: 30,
+                    backgroundColor: 'white'
                 }}
                 showsVerticalScrollIndicator={false}
             >
@@ -113,7 +114,6 @@ const Login = ({ navigation }) => {
                 >
                     <View style={{
                         alignItems: "center",
-                        backgroundColor: "white"
                     }}>
                         <Image source={{ uri: img }}
                             style={{

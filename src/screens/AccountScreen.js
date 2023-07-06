@@ -13,7 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Input from '../uc/Input';
 import * as ImagePicker from 'expo-image-picker';
 import { FIREBASE_AUTH } from '../../firebaseConfig';
-import { deleteUser } from 'firebase/auth';
+import { updateProfile } from 'firebase/auth';
 
 const AccountScreen = ({ navigation }) => {
   const { colors } = useTheme();
@@ -82,7 +82,7 @@ const AccountScreen = ({ navigation }) => {
 
             }}
             source={{
-              uri: selectedImage
+              uri: user.photoURL ? user.photoURL : selectedImage,
             }}
           />
         </TouchableOpacity>
@@ -95,11 +95,11 @@ const AccountScreen = ({ navigation }) => {
         }}>Personal Information</Text>
 
         <View style={{
-          paddingHorizontal:0,
+          paddingHorizontal: 0,
           marginTop: 10,
           gap: 10
         }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => { navigation.navigate('Change Email Screen') }}>
             <View style={styles.viewContainer}>
               <View
                 style={{ width: '90%' }}
@@ -118,7 +118,7 @@ const AccountScreen = ({ navigation }) => {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => { navigation.navigate("Add Address Screen") }}
           >
             <View style={styles.viewContainer}>
@@ -129,7 +129,7 @@ const AccountScreen = ({ navigation }) => {
                   Address
                 </Text>
                 <Text style={styles.textStyles}>
-                  
+
                 </Text>
               </View>
               <Icon
@@ -178,54 +178,55 @@ const AccountScreen = ({ navigation }) => {
               <Text style={[styles.textStylesCap, { textDecorationLine: 'underline' }]}>
                 Delete your account
               </Text>
-            </View>            
+            </View>
           </View>
         </TouchableOpacity>
-        
+
       </ScrollView>
 
-      <View 
-                  style={{
-                    paddingHorizontal: 30,
-                  }}> 
-      
-                  <TouchableOpacity
-                    onPress={() => {navigation.navigate("Add Address Screen")}}
-                    style={{
-                      backgroundColor: colors.primary,
-                      height: 64,
-                      borderRadius: 64,
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      flexDirection: "row",
-                      padding: 12,
-                    }}
-                  >
-                      <View/>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "600",
-                        color: colors.background,
-                      }}
-                    >
-                      Save Information
-                    </Text>
-      
-                    <View
-                      style={{
-                        backgroundColor: colors.card,
-                        width: 40,
-                        aspectRatio: 1,
-                        borderRadius: 40,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}>
-                      <Icon name={"arrow-right"} size={24} color={colors.text} />
-                    </View>
-                  </TouchableOpacity>
-                
-              </View>
+      <View
+        style={{
+          paddingHorizontal: 30,
+          marginBottom: 40,
+        }}>
+
+        <TouchableOpacity
+          onPress={() => { navigation.navigate("Add Address Screen") }}
+          style={{
+            backgroundColor: colors.primary,
+            height: 64,
+            borderRadius: 64,
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexDirection: "row",
+            padding: 12,
+          }}
+        >
+          <View />
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "600",
+              color: colors.background,
+            }}
+          >
+            Save Information
+          </Text>
+
+          <View
+            style={{
+              backgroundColor: colors.card,
+              width: 40,
+              aspectRatio: 1,
+              borderRadius: 40,
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+            <Icon name={"arrow-right"} size={24} color={colors.text} />
+          </View>
+        </TouchableOpacity>
+
+      </View>
 
     </SafeAreaView>
   );

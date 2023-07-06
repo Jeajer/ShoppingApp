@@ -5,16 +5,21 @@ import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
 
-const DetailsScreen = ({navigation, route: {params: {id}}}) => {
+const DetailsScreen = ({navigation, route: {params: {id, name, price, descripton, img}}}) => {
   const bottomSheetRef = useRef(null);
   const insets = useSafeAreaInsets();
 
   const {colors} = useTheme();
   const [count, setCount] = useState(1);
   const [size, setSize] = useState(SIZES[0]);
+  const [imag, setImag] = useState('')
+  
+  
 
   return (
     <View style={{ flex: 1}}>
