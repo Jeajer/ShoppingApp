@@ -19,7 +19,7 @@ const PasswordBox = ({ title, placeholder, keyboard, onFocus = ()=>{{}} }) => {
                 {title}
             </Text>
 
-            <View style={[styles.passwordContainer, { borderColor: isFocused ? "#2078F4" : "#EAEDFB" }]}>
+            <View style={[styles.passwordContainer, { borderColor: isFocused ? "black" : "gray" }]}>
 
                 <TextInput placeholder={placeholder}
                     placeholderTextColor='gray'

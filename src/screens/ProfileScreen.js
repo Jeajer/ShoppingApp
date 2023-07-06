@@ -26,27 +26,32 @@ import { FIREBASE_AUTH } from "../../firebaseConfig";
 const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg";
 
 const GENERAL_LIST = [
-  {
-    icon: "script-text",
-    title: "My orders",
-    screen: "Order Screen",
-  },
-  {
-    icon: "cart",
-    title: "Cart",
-    screen: "Cart Screen",
-  },
-  {
-    icon: "map-marker",
-    title: "Shipping Address",
-    screen: "Address Screen",
-  },
-  {
-    icon: "credit-card",
-    title: "Payment methods",
-    screen: "Payment Screen",
-  },
-];
+    {
+        icon: "script-text",
+        title: "My orders",
+        screen: "Order Screen",
+    },
+    {
+      icon: "post",
+      title: "My posts",
+      screen: "Secondhand Screen",
+    },
+    {
+        icon: "cart",
+        title: "Cart",
+        screen: "Cart Screen",
+    },
+    {
+        icon: "map-marker",
+        title: "Shipping Address",
+        screen: "Address Screen",
+    },
+    {
+        icon: "credit-card",
+        title: "Payment methods",
+        screen: "Payment Screen",
+    },
+  ];
 
 const SUPPORT_LIST = [
   {
@@ -156,23 +161,23 @@ const ProfileScreen = ({ navigation }) => {
         flexDirection: "row",
         marginTop: 20,
       }}>
-        <FlatList
-          contentContainerStyle={{
-            paddingHorizontal: 24,
-            gap: 24,
-          }}
-          data={GENERAL_LIST}
-          renderItem={({ item, index }) => {
+        <FlatList 
+            contentContainerStyle={{
+                paddingHorizontal: 24,
+                gap: 18,
+              }}
+            data={GENERAL_LIST}
+            renderItem={({item, index}) => {
             return (
-              <View>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate(item.screen);
-                  }}>
-                  <RenderItem item={item} index={index} />
-                </TouchableOpacity>
-                <View style={{ height: 1, backgroundColor: colors.border, marginTop: 24 }} />
-              </View>
+                <View>
+                    <TouchableOpacity 
+                        onPress={() => {
+                            navigation.navigate(item.screen);
+                          }}>
+                        <RenderItem item={item} index={index}/>
+                    </TouchableOpacity>
+                    <View style={{height: 1, backgroundColor: colors.border, marginTop: 18}}/>
+                </View>
             )
           }} />
       </View>
@@ -191,20 +196,20 @@ const ProfileScreen = ({ navigation }) => {
         flexDirection: "row",
         marginTop: 20,
       }}>
-        <FlatList
-          contentContainerStyle={{
-            paddingHorizontal: 24,
-            gap: 24,
-          }}
-          data={SUPPORT_LIST}
-          renderItem={({ item, index }) => {
+        <FlatList 
+            contentContainerStyle={{
+                paddingHorizontal: 24,
+                gap: 18,
+              }}
+            data={SUPPORT_LIST}
+            renderItem={({item, index}) => {
             return (
-              <View>
-                <TouchableOpacity>
-                  <RenderItem item={item} index={index} />
-                </TouchableOpacity>
-                <View style={{ height: 1, backgroundColor: colors.border, marginTop: 24 }} />
-              </View>
+                <View>
+                    <TouchableOpacity>
+                        <RenderItem item={item} index={index}/>
+                    </TouchableOpacity>
+                    <View style={{height: 1, backgroundColor: colors.border, marginTop: 18}}/>
+                </View>
             )
           }} />
       </View>

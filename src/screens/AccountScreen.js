@@ -184,6 +184,48 @@ const AccountScreen = ({ navigation }) => {
         
       </ScrollView>
 
+      <View 
+                  style={{
+                    paddingHorizontal: 30,
+                  }}> 
+      
+                  <TouchableOpacity
+                    onPress={() => {navigation.navigate("Add Address Screen")}}
+                    style={{
+                      backgroundColor: colors.primary,
+                      height: 64,
+                      borderRadius: 64,
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      flexDirection: "row",
+                      padding: 12,
+                    }}
+                  >
+                      <View/>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "600",
+                        color: colors.background,
+                      }}
+                    >
+                      Save Information
+                    </Text>
+      
+                    <View
+                      style={{
+                        backgroundColor: colors.card,
+                        width: 40,
+                        aspectRatio: 1,
+                        borderRadius: 40,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}>
+                      <Icon name={"arrow-right"} size={24} color={colors.text} />
+                    </View>
+                  </TouchableOpacity>
+                
+              </View>
 
     </SafeAreaView>
   );

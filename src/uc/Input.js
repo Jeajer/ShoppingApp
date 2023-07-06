@@ -17,7 +17,7 @@ const Input = ({title, icon, placeholder, isPassword, keyboard, onFocus, onChang
                 {title}
             </Text>
 
-            <View style={[styles.passwordContainer, { borderColor: isFocused ? "#2078F4" : "#EAEDFB" }]}>
+            <View style={[styles.passwordContainer, { borderColor: isFocused ? "black" : "gray" }]}>
                 
                 <TextInput placeholder={placeholder}
                     placeholderTextColor='gray'
@@ -40,7 +40,7 @@ const Input = ({title, icon, placeholder, isPassword, keyboard, onFocus, onChang
                     maxLength={maxLength}
                 >
                 </TextInput>    
-                <Icon name={icon} size={20} color={isFocused ? "#2078F4" : "#B1B3CD"} />
+                <Icon name={icon} size={20} color={isFocused ? "black" : "gray"} />
             </View>            
         </View>
     )

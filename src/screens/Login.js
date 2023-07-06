@@ -6,7 +6,7 @@ import { signInWithPopup, signInWithEmailAndPassword, sendPasswordResetEmail } f
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { SignInWithGoogle } from '../utilities/Utilities';
 
-const img = "https://img.freepik.com/premium-vector/laptop-with-online-shop-where-catalog-clothes-shows-t-shirt-socks-shorts-blue_249405-51.jpg?w=1380"
+const img = "https://images.squarespace-cdn.com/content/v1/5e62cbf3daf9e45668fae6f0/1586199684548-T1XPYLITQ9EXU7RNV75J/BannerAnimation3.gif?format=2500w"
 const fbImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png"
 const ggImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/2008px-Google_%22G%22_Logo.svg.png"
 

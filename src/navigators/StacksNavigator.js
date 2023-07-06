@@ -19,6 +19,8 @@ import ChangePasswordScreen from "../screens/ChangPasswordScreen";
 import ResetPasswordScreen from "../screens/ResetPassword";
 import DeleteAccountScreen from "../screens/DeleteAccountScreen";
 import ReAuthentication from "../screens/ReAuthentication";
+import SecondhandScreen from "../screens/SecondhandScreen";
+import DetailOrderScreen from "../screens/DetailOrderScreen";
 
 const Stack = createStackNavigator();
 
@@ -51,6 +53,8 @@ const StacksNavigator = () => {
       <Stack.Screen name="Reset Password Screen" component={ResetPasswordScreen} />
       <Stack.Screen name="Delete Account Screen" component={DeleteAccountScreen} />
       <Stack.Screen name="Re-Authentication Screen" component={ReAuthentication} />
+      <Stack.Screen name="Secondhand Screen" component={SecondhandScreen} />
+      <Stack.Screen name="Detail Order Screen" component={DetailOrderScreen} />
     </Stack.Navigator>
   );
 }
