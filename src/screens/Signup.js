@@ -12,10 +12,10 @@ import {
 } from 'react-native'
 import React, { useState } from 'react'
 import { FIREBASE_AUTH, FIREBASE_PROVIDER, FIREBASE_DB } from '../../firebaseConfig';
-import { signInWithPopup, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import firebase from '../../firebaseConfig';
+import { updateProfile, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import {firebase} from '../../firebaseConfig';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { CreateUserWithEmailAndPassword } from '../utilities/Utilities';
+import {doc, setDoc} from 'firebase/firestore'
 
 const img = "https://images.squarespace-cdn.com/content/v1/5e62cbf3daf9e45668fae6f0/1586199684548-T1XPYLITQ9EXU7RNV75J/BannerAnimation3.gif?format=2500w"
 const fbImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png"
@@ -35,6 +35,7 @@ const Signup = ({ navigation }) => {
     const [loading, setLoading] = useState(false)
 
     const auth = FIREBASE_AUTH
+    const user = FIREBASE_AUTH.currentUser
 
     const [isFocused, setIsFocused] = React.useState(false);
     const [isFNameFocused, setIsFNameFocused] = React.useState(false);
@@ -93,14 +94,67 @@ const Signup = ({ navigation }) => {
         }
     }
 
-    const handleSignIn = (email, password) => {
+    const data = {
+        firstName: firstName,
+        lastName: lastname,
+        address: '',
+        email: email,
+        id: '',        
+    };
+
+    const todoRef = firebase.firestore().collection('Users');
+    const [addData, setAddData] = useState('');
+
+    const addField = async() => {
+        if(firstName && firstName.length>0){            
+            const data = {
+                firstName: firstName,
+                lastName: lastname,
+                address: '',
+                email: email,
+                id: FIREBASE_AUTH.currentUser.uid,
+            };
+            todoRef
+                .add(data)
+                .then(() => {
+                    setAddData('');
+                })
+                .catch((error) => {
+                    console.log(error.message)
+                })
+        }
+    }
+
+    const handleSignIn = async (email, password) => {
         setLoading(true)
         createUserWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                ToastAndroid.show("Sign Up Success", ToastAndroid.SHORT);
-                setLoading(false)
+            .then(async () => {
+                updateProfile(FIREBASE_AUTH.currentUser, {
+                    displayName: firstName + lastname,
+                    photoURL: 'https://in.pinterest.com/pin/324470348158135032/',
+                }).then(() => {
+                    console.log(user.displayName)
+                }).catch((error) => {
+                    console.log(error.message)
+                });
+                
+                try { 
+                    setDoc(doc(FIREBASE_DB, "Users", "Customers"), {
+                        firstName: firstName,
+                        lastName: lastname,
+                        address: '',
+                        email: email,
+                        id: FIREBASE_AUTH.currentUser.uid,
+                    }).then(() => {
+                        console.log('success')
+                    }).catch((error) => {
+                        console.log(error.message)
+                    });
+                } catch(error) {
+                    console.log(error.message)
+                }
             }).catch((error) => {
-                if (error.code === 'auth/email-already-in-use'){
+                if (error.code === 'auth/email-already-in-use') {
                     alert('User is already existed');
                     errors.email = 'User is already existed';
                     setErros(errors)
@@ -108,6 +162,7 @@ const Signup = ({ navigation }) => {
                 console.log(error.code);
                 setLoading(false)
             })
+        setLoading(false);
     }
 
     return (

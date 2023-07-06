@@ -1,31 +1,18 @@
 import {
-  React,
-  useState,
-  useRef,
-  useCallback,
-  useMemo
+  React, useState,
 } from 'react';
 import {
   View,
   Text,
-  Button,
-  StyleSheet,
-  ScrollView,
   Image,
-  Touchable,
   TouchableOpacity,
   FlatList,
-  Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MasonryList from '@react-native-seoul/masonry-list';
-import { BlurView } from 'expo-blur';
-import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import CustomBackdrop from "../components/CustomBackdrop";
-import FilterView from "../components/FilterView";
 import { SignOutUser } from '../utilities/Utilities';
+import { FIREBASE_AUTH } from "../../firebaseConfig";
 
 const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg";
 
@@ -55,17 +42,21 @@ const GENERAL_LIST = [
         title: "Payment methods",
         screen: "Payment Screen",
     },
-  ];
-
-const SUPPORT_LIST = [
   {
     icon: "alert-circle-outline",
     title: "Report an issue",
   },
+  ];
+
+const SUPPORT_LIST = [
+  
 ];
 
 const ProfileScreen = ({ navigation }) => {
   const { colors } = useTheme();
+
+  const user = FIREBASE_AUTH.currentUser;
+  const displayName = user.displayName;
 
   const RenderItem = ({ item, index }) => {
     return (
@@ -78,10 +69,10 @@ const ProfileScreen = ({ navigation }) => {
         <View style={{
           flexDirection: "row",
           alignItems: "center",
-          gap: 20,
+          gap: 15,
         }}>
-          <Icon name={item.icon} size={35} color={colors.text} />
-          <Text style={{ fontSize: 17, fontWeight: "500", color: colors.text }}>{item.title}</Text>
+          <Icon name={item.icon} size={30} color={colors.text} />
+          <Text style={{ fontSize: 16, fontWeight: "500", color: colors.text }}>{item.title}</Text>
         </View>
         <Icon name={"chevron-right"} size={30} color={colors.text} />
       </View>
@@ -89,7 +80,7 @@ const ProfileScreen = ({ navigation }) => {
   }
 
   const handleSignOut = () => {
-    try{
+    try {
       SignOutUser();
       console.log('signed out!')
     } catch (error) {
@@ -101,6 +92,8 @@ const ProfileScreen = ({ navigation }) => {
     <SafeAreaView style={{
       paddingVertical: 24,
       gap: 30,
+      backgroundColor: 'white',
+      flex: 1,
     }}>
       <View style={{
         paddingHorizontal: 24,
@@ -114,7 +107,7 @@ const ProfileScreen = ({ navigation }) => {
           fontWeight: "700",
         }}>Profile</Text>
         <TouchableOpacity
-          onPress={() => {handleSignOut()}}
+          onPress={() => { handleSignOut() }}
         >
           <Icon name='logout' size={30} color="#000" />
         </TouchableOpacity>
@@ -135,11 +128,11 @@ const ProfileScreen = ({ navigation }) => {
             resizeMode="cover" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 6, color: colors.text }}>
-              Hi, James 👋
+              Hi, {user.displayName ? user.displayName : "Anonymous User"} 👋
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>
-              James@gmail.com
+              {user.email}
             </Text>
           </View>
           <Icon name="chevron-right" size={30} color={colors.text} />
@@ -147,7 +140,7 @@ const ProfileScreen = ({ navigation }) => {
       </View>
 
       <Text style={{
-        marginTop: 20,
+        marginTop: 10,
         fontSize: 16,
         fontWeight: "500",
         paddingHorizontal: 24,
@@ -158,14 +151,14 @@ const ProfileScreen = ({ navigation }) => {
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
-        marginTop: -10,
+        marginTop: 0,
       }}>
         <FlatList 
             contentContainerStyle={{
                 paddingHorizontal: 24,
-                gap: 18,
+                gap: 18,                
               }}
-            data={GENERAL_LIST}
+            data={GENERAL_LIST}            
             renderItem={({item, index}) => {
             return (
                 <View>
@@ -173,38 +166,6 @@ const ProfileScreen = ({ navigation }) => {
                         onPress={() => {
                             navigation.navigate(item.screen);
                           }}>
-                        <RenderItem item={item} index={index}/>
-                    </TouchableOpacity>
-                    <View style={{height: 1, backgroundColor: colors.border, marginTop: 18}}/>
-                </View>
-            )
-          }} />
-      </View>
-
-      <Text style={{
-        marginTop: 10,
-        fontSize: 16,
-        fontWeight: "500",
-        paddingHorizontal: 24,
-        opacity: 0.6
-      }}>Support</Text>
-
-      <View style={{
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexDirection: "row",
-        marginTop: -10,
-      }}>
-        <FlatList 
-            contentContainerStyle={{
-                paddingHorizontal: 24,
-                gap: 18,
-              }}
-            data={SUPPORT_LIST}
-            renderItem={({item, index}) => {
-            return (
-                <View>
-                    <TouchableOpacity>
                         <RenderItem item={item} index={index}/>
                     </TouchableOpacity>
                     <View style={{height: 1, backgroundColor: colors.border, marginTop: 18}}/>

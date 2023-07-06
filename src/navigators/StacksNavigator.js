@@ -15,8 +15,13 @@ import OrderScreen from "../screens/OrderScreen";
 import AddressScreen from "../screens/AddressScreen";
 import AddAddressScreen from "../screens/AddAddressScreen";
 import AccountScreen from "../screens/AccountScreen";
+import ChangePasswordScreen from "../screens/ChangPasswordScreen";
+import ResetPasswordScreen from "../screens/ResetPassword";
+import DeleteAccountScreen from "../screens/DeleteAccountScreen";
+import ReAuthentication from "../screens/ReAuthentication";
 import SecondhandScreen from "../screens/SecondhandScreen";
 import DetailOrderScreen from "../screens/DetailOrderScreen";
+import ChangeEmailScreen from "../screens/ChangeEmailScreen";
 
 const Stack = createStackNavigator();
 
@@ -30,7 +35,7 @@ const screenOptionStyle = {
 
 const StacksNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>  
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Onboarding Screen" component={OnboardingScreen} />
       <Stack.Screen name="Home Screen" component={TabNavigator} />
       <Stack.Screen name="Details Screen" component={DetailsScreen} />
@@ -45,8 +50,13 @@ const StacksNavigator = () => {
       <Stack.Screen name="Address Screen" component={AddressScreen} />
       <Stack.Screen name="Add Address Screen" component={AddAddressScreen} />
       <Stack.Screen name="Account Screen" component={AccountScreen} />
+      <Stack.Screen name="Change Password Screen" component={ChangePasswordScreen} />
+      <Stack.Screen name="Reset Password Screen" component={ResetPasswordScreen} />
+      <Stack.Screen name="Delete Account Screen" component={DeleteAccountScreen} />
+      <Stack.Screen name="Re-Authentication Screen" component={ReAuthentication} />
       <Stack.Screen name="Secondhand Screen" component={SecondhandScreen} />
       <Stack.Screen name="Detail Order Screen" component={DetailOrderScreen} />
+      <Stack.Screen name="Change Email Screen" component={ChangeEmailScreen} />
     </Stack.Navigator>
   );
 }
