@@ -138,21 +138,20 @@ const Signup = ({ navigation }) => {
                     console.log(error.message)
                 });
                 
-                try { 
-                    setDoc(doc(FIREBASE_DB, "Users", "Customers"), {
+                try {
+                    await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid), {
                         firstName: firstName,
                         lastName: lastname,
-                        address: '',
                         email: email,
                         id: FIREBASE_AUTH.currentUser.uid,
-                    }).then(() => {
-                        console.log('success')
-                    }).catch((error) => {
-                        console.log(error.message)
+                        detail: '',
+                        district: '',
+                        city: '',
+                        country: '',
                     });
-                } catch(error) {
+                } catch (error) {
                     console.log(error.message)
-                }
+                } 
             }).catch((error) => {
                 if (error.code === 'auth/email-already-in-use') {
                     alert('User is already existed');
