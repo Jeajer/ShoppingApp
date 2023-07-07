@@ -27,28 +27,64 @@ import {
       quantity: "03",
       amount: "$150"
     },
-    {
-      order: "No1212",
-      date: "20/05/2023",
-      quantity: "03",
-      amount: "$150"
-    },
-    {
-      order: "No1212",
-      date: "20/05/2023",
-      quantity: "03",
-      amount: "$150"
-    },
-    {
-      order: "No1212",
-      date: "20/05/2023",
-      quantity: "03",
-      amount: "$150"
-    },
   ];
 
   const DeliveredScreen = ({navigation}) => {
     const {colors} = useTheme();
+
+    const [resultArray, setResultArray] = useState([]);
+    const [resultOrder, setResultOrder] = useState([]);
+
+    const getListDataFromAsyncStorage = async (key) => {
+      try {
+        // Lấy chuỗi JSON từ AsyncStorage
+        const jsonValue = await AsyncStorage.getItem(key);
+    
+        if (jsonValue !== null) {
+          // Chuyển đổi chuỗi JSON thành mảng
+          const listData = JSON.parse(jsonValue);
+          console.log('List data retrieved from AsyncStorage:', listData);
+          return listData;
+        }
+      } catch (error) {
+        console.log('Error retrieving list data from AsyncStorage:', error);
+      }
+    
+      return []; // Trả về một mảng rỗng nếu không có dữ liệu trong AsyncStorage
+    };
+
+    const getValueFromAsyncStorage = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('favorites');
+        if (jsonValue !== null) {
+          const value = JSON.parse(jsonValue);
+          console.log('Value retrieved from Favorite:', value);
+          return value;
+        } else {
+          console.log('Value not found in AsyncStorage');
+          return null;
+        }
+      } catch (error) {
+        console.log('Error retrieving value from AsyncStorage:', error);
+        return null;
+      }
+    };
+  
+    const fetchValue = async () => {
+      
+      const order = await getValueFromAsyncStorage();
+      setResultOrder(order);
+
+      const result =[];
+
+      order.forEach((item) => {
+        result.push(getListDataFromAsyncStorage(item));
+      });
+
+      console.log(order);
+      console.log(result);
+    };
+  
 
     const RenderItem = ({item, index}) => {
       return (

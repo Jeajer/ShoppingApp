@@ -21,25 +21,7 @@ import {
 
   const GENERAL_LIST = [
     {
-      order: "No1212",
-      date: "20/05/2023",
-      quantity: "03",
-      amount: "$150"
-    },
-    {
-      order: "No1212",
-      date: "20/05/2023",
-      quantity: "03",
-      amount: "$150"
-    },
-    {
-      order: "No1212",
-      date: "20/05/2023",
-      quantity: "03",
-      amount: "$150"
-    },
-    {
-      order: "No1212",
+      order: "No121",
       date: "20/05/2023",
       quantity: "03",
       amount: "$150"

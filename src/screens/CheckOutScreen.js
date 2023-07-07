@@ -1,13 +1,46 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Button } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CheckOutScreen = ({navigation}) => {
+const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
   const {colors} = useTheme();
+  const [resultArray, setResultArray] = useState([]);
+
+  const getListDataFromAsyncStorage = async () => {
+    try {
+      // Lấy chuỗi JSON từ AsyncStorage
+      const jsonValue = await AsyncStorage.getItem(randomNumber);
+  
+      if (jsonValue !== null) {
+        // Chuyển đổi chuỗi JSON thành mảng
+        const listData = JSON.parse(jsonValue);
+        console.log('List data retrieved from AsyncStorage:', listData);
+        return listData;
+      }
+    } catch (error) {
+      console.log('Error retrieving list data from AsyncStorage:', error);
+    }
+  
+    return []; // Trả về một mảng rỗng nếu không có dữ liệu trong AsyncStorage
+  };
+
+  const fetchValue = async () => {
+    const data = await getListDataFromAsyncStorage();
+    setResultArray(data);
+  };
+
+  useEffect(() => {
+    fetchValue();
+  }, []);
+
+  const calculateTotalPrice = () => {
+    return resultArray.reduce((total, product) => total + product.price, 0);
+  };
 
   return (
     <SafeAreaView style={{
@@ -185,7 +218,7 @@ const CheckOutScreen = ({navigation}) => {
             fontWeight: "600",
             color: colors.text,
           }}>
-            ${(600000).toLocaleString()}
+            ${calculateTotalPrice().toLocaleString()}
           </Text>
         </View>
 
@@ -208,7 +241,7 @@ const CheckOutScreen = ({navigation}) => {
             fontWeight: "600",
             color: colors.text,
           }}>
-            ${(40000).toLocaleString()}
+            ${(10).toLocaleString()}
           </Text>
         </View>
 
@@ -231,7 +264,7 @@ const CheckOutScreen = ({navigation}) => {
             fontWeight: "600",
             color: "red",
           }}>
-            ${(640000).toLocaleString()}
+            ${(calculateTotalPrice() + 10).toLocaleString()}
           </Text>
         </View>
 
