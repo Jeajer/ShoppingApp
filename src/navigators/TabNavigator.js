@@ -23,7 +23,7 @@ const TabsNavigator = () => {
                     component={HomeScreen}
                     options={{
                       tabBarIcon(props) {
-                        return <Icon size={24} color="black" name="home" />}
+                        return <Icon size={24} color="black" name="home" />},
                     }}/>
         <Tab.Screen name="Shop" 
                     component={ShoppingScreen} 
@@ -35,7 +35,8 @@ const TabsNavigator = () => {
                     component={FavoriteScreen} 
                     options={{
                       tabBarIcon(props) {
-                        return <Icon size={24} color="black" name="heart" />}
+                        return <Icon size={24} color="black" name="heart" />},
+                        unmountOnBlur: true,
                     }}/>
         <Tab.Screen name="Account" 
                     component={ProfileNavigator} 

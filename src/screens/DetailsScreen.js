@@ -1,4 +1,4 @@
-import { React, useRef, useState } from 'react';
+import { React, useRef, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
@@ -7,25 +7,121 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
 
-const DetailsScreen = ({navigation, route: {params: {id, name, price, descripton, img}}}) => {
+const DetailsScreen = ({navigation, route: {params: {id, name, price, descripton, imageUrl}}}) => {
   const bottomSheetRef = useRef(null);
   const insets = useSafeAreaInsets();
+  
+  const [isButtonOn, setIsButtonOn] = useState();
+
+  const favoriteBtnClick = () => {
+    setIsButtonOn(!isButtonOn);
+    if(isButtonOn === false) {
+      addItemToArray(id, 'favorites')
+    }
+    else{
+      deleteItemFromArrayAsyncStorage(id);
+    }    
+  };
+
+  const checkElementExistsInArrayAsyncStorage = async (elementName) => {
+    try {
+      // Retrieve the array from AsyncStorage
+      const jsonValue = await AsyncStorage.getItem("favorites");
+      if (jsonValue !== null) {
+        // Parse the array from JSON
+        const array = JSON.parse(jsonValue);
+  
+        // Check if the element exists in the array
+        const exists = array.some(item => item === elementName);
+        
+        if (exists) {
+          console.log('Element exists in the array in AsyncStorage');
+          setIsButtonOn(true);
+        } else {
+          console.log('Element does not exist in the array in AsyncStorage');
+          setIsButtonOn(false);
+        }
+      } else {
+        console.log('Array not found in AsyncStorage');
+      }
+    } catch (error) {
+      console.log('Error checking element existence in the array in AsyncStorage:', error);
+    }
+  };
+  
+
+  const deleteItemFromArrayAsyncStorage = async (elementName) => {
+    try {
+      // Retrieve the array from AsyncStorage
+      const jsonValue = await AsyncStorage.getItem("favorites");
+      let updatedArray = [];
+  
+      if (jsonValue !== null) {
+        // Parse the array from JSON
+        updatedArray = JSON.parse(jsonValue);
+  
+        // Remove items with the specified name value
+        updatedArray = updatedArray.filter(item => item !== elementName);
+      }
+  
+      // Save the updated array back to AsyncStorage
+      await AsyncStorage.setItem("favorites", JSON.stringify(updatedArray));
+  
+      console.log('Items deleted from the array in AsyncStorage');
+    } catch (error) {
+      console.log('Error deleting items from the array in AsyncStorage:', error);
+    }
+  };
 
   const {colors} = useTheme();
   const [count, setCount] = useState(1);
   const [size, setSize] = useState(SIZES[0]);
   const [imag, setImag] = useState('')
   
+  const storeData = async (value) => {
+    try {
+      await AsyncStorage.setItem('id', value);
+    } catch (e) {
+      // saving error
+    }
+  };
+
+  const addItemToArray = async (item, key) => {
+    try {
+      // Retrieve the array from AsyncStorage
+      const existingArray = await AsyncStorage.getItem(key);
+      let updatedArray = [];
   
+      if (existingArray !== null) {
+        // If the array exists, parse it from JSON and update it
+        updatedArray = JSON.parse(existingArray);
+      }
+  
+      // Add the new item to the array
+      updatedArray.push(item);
+  
+      // Save the updated array back to AsyncStorage
+      await AsyncStorage.setItem(key, JSON.stringify(updatedArray));
+  
+      console.log('Item added to the array successfully!');
+    } catch (error) {
+      console.log('Error adding item to the array:', error);
+    }
+  };
+
+  useEffect(() => {
+    checkElementExistsInArrayAsyncStorage(id);
+  }, []);
 
   return (
     <View style={{ flex: 1}}>
       <Image 
         source={{
-          uri: "https://static.nike.com/a/images/t_PDP_864_v1/f_auto,b_rgb:f5f5f5/fbfd2bdd-f1a6-4600-bfa2-0bef8a87952f/jordan-essentials-oversized-graphic-t-shirt-nmkFRm.png"
+          uri: imageUrl
         }}
         style={{
           flex: 1
@@ -55,14 +151,15 @@ const DetailsScreen = ({navigation, route: {params: {id, name, price, descripton
               justifyContent: "center",
               borderRadius: 52,
               borderWidth: 1,
-              borderColor: '#fff'
+              borderColor: 'black'
             }}>
-            <Icon name={"arrow-left"} size={24} color={"#fff"}/>
+            <Icon name={"arrow-left"} size={24} color={"black"}/>
           </TouchableOpacity>
 
           <View style={{flex: 1}}/>
 
           <TouchableOpacity
+           onPress={() => favoriteBtnClick()}
             style={{
               width: 52,
               aspectRatio: 1,
@@ -70,12 +167,16 @@ const DetailsScreen = ({navigation, route: {params: {id, name, price, descripton
               justifyContent: "center",
               borderRadius: 52,
               borderWidth: 1,
-              borderColor: '#fff'
+              borderColor: isButtonOn ? "red" : "black"
             }}>
-            <Icon name={"heart-outline"} size={24} color={"#fff"}/>
+            <Icon 
+              name={isButtonOn ? "heart" : "heart-outline"} 
+              size={24} 
+              color={isButtonOn ? "red" : "black"}/>
           </TouchableOpacity>
 
           <TouchableOpacity
+          onPress={() => navigation.navigate('Cart Screen')}
             style={{
               width: 52,
               aspectRatio: 1,
@@ -83,9 +184,9 @@ const DetailsScreen = ({navigation, route: {params: {id, name, price, descripton
               justifyContent: "center",
               borderRadius: 52,
               borderWidth: 1,
-              borderColor: '#fff'
+              borderColor: 'black'
             }}>
-            <Icon name={"basket-outline"} size={24} color={"#fff"}/>
+            <Icon name={"basket-outline"} size={24} color={"black"}/>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -111,7 +212,7 @@ const DetailsScreen = ({navigation, route: {params: {id, name, price, descripton
             flex: 1
           }}>
           <Text style={{fontSize: 20, fontWeight: "600", color: colors.text }}>
-            PUMA Everyday Hussle
+            {name}
           </Text>
 
           <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
@@ -230,7 +331,7 @@ const DetailsScreen = ({navigation, route: {params: {id, name, price, descripton
                   opacity: 0.75,
                 }}
                 numberOfLines={3}>
-                Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit.
+                {descripton}
               </Text>
             </View>
           </View>
@@ -252,11 +353,12 @@ const DetailsScreen = ({navigation, route: {params: {id, name, price, descripton
               <Text
                 style={{ color: colors.text, fontSize: 18, fontWeight: "600" }}
               >
-                ${(25000).toLocaleString()}
+                ${price.toLocaleString()}
               </Text>
             </View>
 
             <TouchableOpacity
+            onPress={() => addItemToArray(id, "carts")}
               style={{
                 backgroundColor: colors.primary,
                 height: 64,

@@ -1,10 +1,41 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Button } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const listData = [
+  {
+    id: "AR4162-105",
+    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f9e7b076-da72-419c-aaf5-86c8a2785cbb/pico-5-shoes-QQ5g1N.png",
+    price: 30,
+    quantity: 1,
+    name: "Nike Air Pegasus",
+    color: "pink",
+    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
+  },
+  {
+    id: "DV2992-010",
+    price: 50,
+    quantity: 1,
+    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5e169c19-b550-4fb8-bf7e-d49847554fd3/dri-fit-aerobill-legacy91-camo-training-cap-rc1zZQ.png",
+    name: "The Nike Pico 5",
+    color: "black",
+    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
+  },
+  {
+    id: "FB8137-010",
+    price: 70,
+    quantity: 1,
+    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/88e428f8-70de-48b3-a245-c4851c577f9f/sb-skate-t-shirt-g49c6j.png",
+    name: "The Nike Pico 5",
+    color: "black",
+    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
+  },
+];
 
 const FavoriteScreen = ({navigation}) => {
   const {colors} = useTheme();
@@ -14,48 +45,7 @@ const FavoriteScreen = ({navigation}) => {
   const [count, setCount] = useState(1);
   const [text, onChangeText] = useState('');
 
-  const [listData, setListData] = useState([
-    {
-      key: 1,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a5db19b7-dd9a-4e7d-8249-77223324c09f/life-woven-military-short-sleeve-button-down-shirt-4hD9x8.png",
-      title: "PUMA Everyday Hussle",
-      price: 160,
-      color: "red",
-    },
-    {
-      key: 2,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a6106db6-e16c-4de9-9407-be02a10da88b/sportswear-everyday-modern-woven-short-sleeve-top-hRTvkd.png",
-      title: "PUMA Everyday",
-      price: 180,
-      color: "red",
-    },
-    {
-      key: 3,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/0440d244-bff7-4fdf-aab3-cbd00c5d05c7/sportswear-team-nike-short-sleeve-top-l77Dq3.png",
-      title: "PUMA Everyday",
-      price: 200,
-      color: "red",
-    },
-    {
-      key: 4,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/7e7db949-aadc-435e-a709-abb1deac22f7/golf-t-shirt-f1pqcz.png",
-      title: "PUMA Everyday",
-      price: 180,
-      color: "red",
-    },
-    {
-      key: 5,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/e42dbedf-8a3a-4f94-be8d-eef8567e4423/sportswear-icon-clash-short-sleeve-tie-top-GdbMh0.png",
-      title: "PUMA Everyday",
-      price: 120,
-      color: "red",
-    },
-  ]);
+  const [resultArray, setResultArray] = useState([]);
 
   const onRowDidOpen = (rowKey) => {
     console.log('This row opened', rowKey);
@@ -69,11 +59,66 @@ const FavoriteScreen = ({navigation}) => {
 
   const deleteRow = (rowMap, rowKey) => {
     closeRow(rowMap, rowKey);
-    const newData = [...listData];
-    const prevIndex = listData.findIndex(item => item.key === rowKey);
+    const newData = [...resultArray];
+    const prevIndex = resultArray.findIndex(item => item.key === rowKey);  
+    deleteItemFromArrayAsyncStorage(resultArray[prevIndex].id);
     newData.splice(prevIndex, 1);
-    setListData(newData);
+    setResultArray(newData);
   };
+
+  const deleteItemFromArrayAsyncStorage = async (elementName) => {
+    try {
+      // Retrieve the array from AsyncStorage
+      const jsonValue = await AsyncStorage.getItem("favorites");
+      let updatedArray = [];
+  
+      if (jsonValue !== null) {
+        // Parse the array from JSON
+        updatedArray = JSON.parse(jsonValue);
+  
+        // Remove items with the specified name value
+        updatedArray = updatedArray.filter(item => item !== elementName);
+      }
+  
+      // Save the updated array back to AsyncStorage
+      await AsyncStorage.setItem("favorites", JSON.stringify(updatedArray));
+  
+      console.log('Items deleted from the array in AsyncStorage');
+    } catch (error) {
+      console.log('Error deleting items from the array in AsyncStorage:', error);
+    }
+  }
+
+  const getValueFromAsyncStorage = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('favorites');
+      if (jsonValue !== null) {
+        const value = JSON.parse(jsonValue);
+        console.log('Value retrieved from Favorite:', value);
+        return value;
+      } else {
+        console.log('Value not found in AsyncStorage');
+        return null;
+      }
+    } catch (error) {
+      console.log('Error retrieving value from AsyncStorage:', error);
+      return null;
+    }
+  };
+
+  const fetchValue = async () => {
+    const retrievedValue = await getValueFromAsyncStorage();
+    const newArray = retrievedValue ? [...retrievedValue] : [];
+
+    const matchingElements = listData.filter((element) =>
+    newArray.includes(element.id)
+    );
+    setResultArray(matchingElements);
+  };
+
+  useEffect(() => {
+    fetchValue();
+  }, []);
 
   return (
     <SafeAreaView style={{
@@ -93,7 +138,7 @@ const FavoriteScreen = ({navigation}) => {
             }}>Favorite</Text>
             <TouchableOpacity
                 onPress={()=> {navigation.navigate("Cart Screen")}}>
-                <Icon name='cart' size={30} color="#000"/>
+                <Icon name='basket-outline' size={30} color="#000"/>
             </TouchableOpacity>
       </View>
       
@@ -101,7 +146,7 @@ const FavoriteScreen = ({navigation}) => {
         height: "81%"
       }}>
         <SwipeListView
-          data={listData}
+          data={resultArray}
           contentContainerStyle={{paddingHorizontal: 16}}
           renderItem={ (data, rowMap) => {
             return(
@@ -140,7 +185,7 @@ const FavoriteScreen = ({navigation}) => {
                         },
                         textShadowRadius: 4,
                       }}>
-                          {data.item.title}
+                          {data.item.name}
                   </Text>
 
                   <View style={{flexDirection: "row", gap: 7, alignItems: "center"}}>                    

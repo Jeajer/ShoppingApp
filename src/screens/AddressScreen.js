@@ -24,16 +24,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
 import { doc, setDoc, getDoc } from 'firebase/firestore'
 
-const GENERAL_LIST = [
-  {
-    fullname: "Nguyen Van A",
-    address: "25 Le Van Viet",
-    country: "Vietnam",
-    city: "Ho Chi Minh",
-    district: "Quan 9"
-  },
-];
-
 const AddressScreen = ({ navigation }) => {
   const { colors } = useTheme();
 

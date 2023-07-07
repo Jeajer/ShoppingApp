@@ -30,10 +30,6 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 const CATEGORIES = [
   "Clothing",
   "Shoes",
-  "Accessories 1",
-  "Accessories 2",
-  "Accessories 3",
-  "Accessories 4",
 ]
 
 const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg";
@@ -41,31 +37,31 @@ const MESONARY_LIST_DATA = [
   {
     imageUrl:
       "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a5db19b7-dd9a-4e7d-8249-77223324c09f/life-woven-military-short-sleeve-button-down-shirt-4hD9x8.png",
-    title: "PUMA Everyday Hussle",
+    title: "PUMA 1",
     price: 160,
   },
   {
     imageUrl:
       "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a6106db6-e16c-4de9-9407-be02a10da88b/sportswear-everyday-modern-woven-short-sleeve-top-hRTvkd.png",
-    title: "PUMA Everyday",
+    title: "PUMA 2",
     price: 180,
   },
   {
     imageUrl:
       "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/0440d244-bff7-4fdf-aab3-cbd00c5d05c7/sportswear-team-nike-short-sleeve-top-l77Dq3.png",
-    title: "PUMA Everyday",
+    title: "PUMA 3",
     price: 200,
   },
   {
     imageUrl:
       "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/7e7db949-aadc-435e-a709-abb1deac22f7/golf-t-shirt-f1pqcz.png",
-    title: "PUMA Everyday",
+    title: "PUMA 4",
     price: 180,
   },
   {
     imageUrl:
       "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/e42dbedf-8a3a-4f94-be8d-eef8567e4423/sportswear-icon-clash-short-sleeve-tie-top-GdbMh0.png",
-    title: "PUMA Everyday",
+    title: "PUMA 5",
     price: 120,
   },
 ];
@@ -140,7 +136,8 @@ const ShoppingScreen = ({ navigation }) => {
             resizeMode="cover" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 6, color: colors.text }}>
-              Hi, {user.displayName} 👋
+              {/* Hi, {user.displayName} 👋 */}
+              Hi 👋
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>
@@ -222,32 +219,46 @@ const ShoppingScreen = ({ navigation }) => {
             {/* Card */}
             <Card
               onPress={() => {
-                handleMoveToDetail('AR4162-105')
-              }}
-              id= 'AR4162-105'
-              price={889000}
-              imageUrl="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f9e7b076-da72-419c-aaf5-86c8a2785cbb/pico-5-shoes-QQ5g1N.png"
+                navigation.navigate("Details Screen",{
+                  id: "AR4162-105",
+                  imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f9e7b076-da72-419c-aaf5-86c8a2785cbb/pico-5-shoes-QQ5g1N.png",
+                  price: 30,
+                  name: "Nike Air Pegasus",
+                  descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
+                });  
+              }}  
+              id = "AR4162-105"
+              imageUrl = "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f9e7b076-da72-419c-aaf5-86c8a2785cbb/pico-5-shoes-QQ5g1N.png"
+              price = {30}         
             />
 
             <View style={{ flex: 1, gap: 12 }}>
               <Card
                 onPress={() => {
                   navigation.navigate("Details Screen", {
-                    id: "DV2992-010"
+                    id: "DV2992-010",
+                    price: 50,
+                    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5e169c19-b550-4fb8-bf7e-d49847554fd3/dri-fit-aerobill-legacy91-camo-training-cap-rc1zZQ.png",
+                    name: "The Nike Pico 5",
+                    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
                   });
                 }}
-                id= 'DV2992-010'
-                price={660000}
-                imageUrl="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5e169c19-b550-4fb8-bf7e-d49847554fd3/dri-fit-aerobill-legacy91-camo-training-cap-rc1zZQ.png"
+                i = "DV2992-010"
+                price = {50}
+                imageUrl = "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5e169c19-b550-4fb8-bf7e-d49847554fd3/dri-fit-aerobill-legacy91-camo-training-cap-rc1zZQ.png"
               />
               <Card
                 onPress={() => {
                   navigation.navigate("Details Screen", {
-                    id: "FB8137-010"
+                    id: "FB8137-010",
+                    price: 70,
+                    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/88e428f8-70de-48b3-a245-c4851c577f9f/sb-skate-t-shirt-g49c6j.png",
+                    name: "The Nike Pico 5",
+                    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
                   });
                 }}
                 id='FB8137-010'
-                price={860000}
+                price={70}
                 imageUrl="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/88e428f8-70de-48b3-a245-c4851c577f9f/sb-skate-t-shirt-g49c6j.png"
               />
             </View>
@@ -451,7 +462,7 @@ const Card = ({
         }}
       >
         <Text style={{ fontSize: 14, fontWeight: "600", color: "#fff" }}>
-          {price}đ
+          ${price}
         </Text>
       </View>
     </TouchableOpacity>
