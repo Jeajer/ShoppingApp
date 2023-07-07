@@ -21,7 +21,6 @@ const CustomBottomTab = (props: BottomTabBarProps) => {
                             flexDirection: "row",
                             paddingVertical: 10,
                             borderTopColor: '#DADADA',
-                            borderTopWidth: '1'
                             }}
                         onPress={() => props.navigation.navigate(route.name)}>
                         <View 

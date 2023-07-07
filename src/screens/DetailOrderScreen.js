@@ -7,17 +7,17 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const ORDER_LIST = [
   {
-    name_pro: "PUMA Everyday",
-    img: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a5db19b7-dd9a-4e7d-8249-77223324c09f/life-woven-military-short-sleeve-button-down-shirt-4hD9x8.png",
-    color: "green",
-    price: 300,
+    name_pro: "Nike Air Pegasus",
+    img: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f9e7b076-da72-419c-aaf5-86c8a2785cbb/pico-5-shoes-QQ5g1N.png",
+    color: "pink",
+    price: 30,
     quantity: "1",
   },
   {
-    name_pro: "PUMA Everyday",
-    img: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a5db19b7-dd9a-4e7d-8249-77223324c09f/life-woven-military-short-sleeve-button-down-shirt-4hD9x8.png",
-    color: "green",
-    price: 3000,
+    name_pro: "The Nike Pico 5",
+    img: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5e169c19-b550-4fb8-bf7e-d49847554fd3/dri-fit-aerobill-legacy91-camo-training-cap-rc1zZQ.png",
+    color: "black",
+    price: 50,
     quantity: "1",
   },
   
@@ -185,7 +185,7 @@ const DetailOrderScreen = ({navigation}) => {
                   fontWeight: "600",
                   color: colors.text,
                 }}>
-                  ${(600000).toLocaleString()}
+                  ${(80).toLocaleString()}
                 </Text>
               </View>
 
@@ -208,7 +208,7 @@ const DetailOrderScreen = ({navigation}) => {
                   fontWeight: "600",
                   color: colors.text,
                 }}>
-                  ${(40000).toLocaleString()}
+                  ${(10).toLocaleString()}
                 </Text>
               </View>
 
@@ -231,7 +231,7 @@ const DetailOrderScreen = ({navigation}) => {
                   fontWeight: "600",
                   color: colors.text,
                 }}>
-                  - ${(40000).toLocaleString()}
+                  - ${(0).toLocaleString()}
                 </Text>
               </View>
 
@@ -254,7 +254,7 @@ const DetailOrderScreen = ({navigation}) => {
                   fontWeight: "600",
                   color: "red",
                 }}>
-                  ${(768000).toLocaleString()}
+                  ${(90).toLocaleString()}
                 </Text>
               </View>
 

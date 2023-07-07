@@ -27,20 +27,6 @@ import {
         city: "Ho Chi Minh",
         district: "Quan 9"
     },
-    {
-        fullname: "Nguyen Van A",
-        address: "25 Le Van Viet",
-        country: "Vietnam",
-        city: "Ho Chi Minh",
-        district: "Quan 9"
-    },
-    {
-        fullname: "Nguyen Van A",
-        address: "25 Le Van Viet",
-        country: "Vietnam",
-        city: "Ho Chi Minh",
-        district: "Quan 9"
-    },
   ];
 
   const AddressScreen = ({navigation}) => {

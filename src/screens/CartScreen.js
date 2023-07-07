@@ -1,10 +1,41 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Button } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const listData = [
+  {
+    id: "AR4162-105",
+    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f9e7b076-da72-419c-aaf5-86c8a2785cbb/pico-5-shoes-QQ5g1N.png",
+    price: 30,
+    quantity: 1,
+    name: "Nike Air Pegasus",
+    color: "pink",
+    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
+  },
+  {
+    id: "DV2992-010",
+    price: 50,
+    quantity: 1,
+    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5e169c19-b550-4fb8-bf7e-d49847554fd3/dri-fit-aerobill-legacy91-camo-training-cap-rc1zZQ.png",
+    name: "The Nike Pico 5",
+    color: "black",
+    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
+  },
+  {
+    id: "FB8137-010",
+    price: 70,
+    quantity: 1,
+    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/88e428f8-70de-48b3-a245-c4851c577f9f/sb-skate-t-shirt-g49c6j.png",
+    name: "The Nike Pico 5",
+    color: "black",
+    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
+  },
+];
 
 const CartScreen = ({navigation}) => {
   const {colors} = useTheme();
@@ -13,49 +44,32 @@ const CartScreen = ({navigation}) => {
   const [total, setTotal] = useState(null); 
   const [count, setCount] = useState(1);
   const [text, onChangeText] = useState('');
+  const [randomNumber, setRandomNumber] = useState(0);
 
-  const [listData, setListData] = useState([
-    {
-      key: 1,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a5db19b7-dd9a-4e7d-8249-77223324c09f/life-woven-military-short-sleeve-button-down-shirt-4hD9x8.png",
-      title: "PUMA Everyday Hussle",
-      price: 160,
-      color: "red",
-    },
-    {
-      key: 2,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a6106db6-e16c-4de9-9407-be02a10da88b/sportswear-everyday-modern-woven-short-sleeve-top-hRTvkd.png",
-      title: "PUMA Everyday",
-      price: 180,
-      color: "red",
-    },
-    {
-      key: 3,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/0440d244-bff7-4fdf-aab3-cbd00c5d05c7/sportswear-team-nike-short-sleeve-top-l77Dq3.png",
-      title: "PUMA Everyday",
-      price: 200,
-      color: "red",
-    },
-    {
-      key: 4,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/7e7db949-aadc-435e-a709-abb1deac22f7/golf-t-shirt-f1pqcz.png",
-      title: "PUMA Everyday",
-      price: 180,
-      color: "red",
-    },
-    {
-      key: 5,
-      imageUrl:
-        "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/e42dbedf-8a3a-4f94-be8d-eef8567e4423/sportswear-icon-clash-short-sleeve-tie-top-GdbMh0.png",
-      title: "PUMA Everyday",
-      price: 120,
-      color: "red",
-    },
-  ]);
+  const [resultArray, setResultArray] = useState([]);
+
+  const QuantityPlus = (value) => {
+    
+    const prevIndex = resultArray.findIndex(item => item.id === value);
+    setCount((count) => Math.max(1, resultArray[prevIndex].quantity + 1));
+    updateItemQuantity(value, count);
+  }
+
+  const updateItemQuantity = (itemId, newQuantity) => {
+    // Tìm phần tử cần cập nhật dựa trên itemId
+    const itemIndex = data.findIndex(item => item.id === itemId);
+  
+    if (itemIndex !== -1) {
+      // Tạo một bản sao của nguồn dữ liệu (data)
+      const updatedData = [...resultArray];
+      
+      // Cập nhật số lượng của phần tử
+      updatedData[itemIndex].quantity = newQuantity;
+  
+      // Cập nhật nguồn dữ liệu (data) của FlatList
+      setResultArray(updatedData);
+    }
+  };
 
   const onRowDidOpen = (rowKey) => {
     console.log('This row opened', rowKey);
@@ -69,10 +83,124 @@ const CartScreen = ({navigation}) => {
 
   const deleteRow = (rowMap, rowKey) => {
     closeRow(rowMap, rowKey);
-    const newData = [...listData];
-    const prevIndex = listData.findIndex(item => item.key === rowKey);
+    const newData = [...resultArray];
+    const prevIndex = resultArray.findIndex(item => item.key === rowKey);  
+    deleteItemFromArrayAsyncStorage(resultArray[prevIndex].id);
     newData.splice(prevIndex, 1);
-    setListData(newData);
+    setResultArray(newData);
+  };
+
+  const getRandomNumbers = (n) => {
+    const numbers = [];
+    for (let i = 0; i < n; i++) {
+      const ran = Math.floor(Math.random() * 10); // Lấy giá trị ngẫu nhiên từ 0 đến 9
+      numbers.push(ran);
+    }
+    return numbers;
+  };
+
+  const checkOut = () => {
+    setRandomNumber(getRandomNumbers(6).toString());
+    addItemToArray(randomNumber, "orders");
+    console.log('Value retrieved 1:', randomNumber);
+    saveListDataToAsyncStorage(resultArray, randomNumber);
+
+    navigation.navigate("Check Out Screen", {randomNumber});
+  };
+
+  const deleteItemFromArrayAsyncStorage = async (elementName) => {
+    try {
+      // Retrieve the array from AsyncStorage
+      const jsonValue = await AsyncStorage.getItem("carts");
+      let updatedArray = [];
+  
+      if (jsonValue !== null) {
+        // Parse the array from JSON
+        updatedArray = JSON.parse(jsonValue);
+  
+        // Remove items with the specified name value
+        updatedArray = updatedArray.filter(item => item !== elementName);
+      }
+  
+      // Save the updated array back to AsyncStorage
+      await AsyncStorage.setItem("carts", JSON.stringify(updatedArray));
+  
+      console.log('Items deleted from the array in AsyncStorage');
+    } catch (error) {
+      console.log('Error deleting items from the array in AsyncStorage:', error);
+    }
+  }
+
+  const saveListDataToAsyncStorage = async (list, key) => {
+    try {
+      // Chuyển đổi mảng thành chuỗi JSON
+      const jsonValue = JSON.stringify(list);
+      
+      // Lưu chuỗi JSON vào AsyncStorage
+      await AsyncStorage.setItem(key, jsonValue);
+  
+      console.log('List data saved to AsyncStorage');
+    } catch (error) {
+      console.log('Error saving list data to AsyncStorage:', error);
+    }
+  };
+
+  const addItemToArray = async (item, key) => {
+    try {
+      // Retrieve the array from AsyncStorage
+      const existingArray = await AsyncStorage.getItem(key);
+      let updatedArray = [];
+  
+      if (existingArray !== null) {
+        // If the array exists, parse it from JSON and update it
+        updatedArray = JSON.parse(existingArray);
+      }
+  
+      // Add the new item to the array
+      updatedArray.push(item);
+  
+      // Save the updated array back to AsyncStorage
+      await AsyncStorage.setItem(key, JSON.stringify(updatedArray));
+  
+      console.log('Item added to the array successfully!');
+    } catch (error) {
+      console.log('Error adding item to the array:', error);
+    }
+  };
+
+  const getValueFromAsyncStorage = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('carts');
+      if (jsonValue !== null) {
+        const value = JSON.parse(jsonValue);
+        console.log('Value retrieved from AsyncStorage:', value);
+        return value;
+      } else {
+        console.log('Value not found in AsyncStorage');
+        return null;
+      }
+    } catch (error) {
+      console.log('Error retrieving value from AsyncStorage:', error);
+      return null;
+    }
+  };
+
+  const fetchValue = async () => {
+    const retrievedValue = await getValueFromAsyncStorage();
+    const newArray = retrievedValue ? [...retrievedValue] : [];
+
+    const matchingElements = listData.filter((element) =>
+    newArray.includes(element.id)
+    );
+    setResultArray(matchingElements);
+  };
+
+  useEffect(() => {
+    fetchValue();
+  }, []);
+
+  const calculateTotalPrice = () => {
+    return resultArray.reduce((total, product) => total + product.price, 0);
   };
 
   return (
@@ -103,7 +231,7 @@ const CartScreen = ({navigation}) => {
           paddingVertical: 5,
           }}>
         <SwipeListView
-          data={listData}
+          data={resultArray}
           contentContainerStyle={{paddingHorizontal: 16}}
           renderItem={ (data, rowMap) => {
             return(
@@ -142,7 +270,7 @@ const CartScreen = ({navigation}) => {
                         },
                         textShadowRadius: 4,
                       }}>
-                          {data.item.title}
+                          {data.item.name}
                   </Text>
 
                   <View style={{flexDirection: "row", gap: 7, alignItems: "center"}}>                    
@@ -187,9 +315,9 @@ const CartScreen = ({navigation}) => {
                         fontSize: 12,
                         fontWeight: "600",
                         color: colors.background
-                      }}>{count}</Text>
+                      }}>{data.item.quantity}</Text>
                     <TouchableOpacity
-                      onPress={() => setCount((count) => Math.min(10, count + 1))}
+                      onPress={() => QuantityPlus(data.item.id)}
                       style={{
                         backgroundColor: colors.card,
                         width: 24,
@@ -344,7 +472,7 @@ const CartScreen = ({navigation}) => {
             fontWeight: "600",
             color: colors.text,
           }}>
-            ${(600000).toLocaleString()}
+            ${calculateTotalPrice().toLocaleString()}
           </Text>
         </View>
         
@@ -368,12 +496,13 @@ const CartScreen = ({navigation}) => {
               <Text
                 style={{ color: "red", fontSize: 18, fontWeight: "600" }}
               >
-                ${(768000).toLocaleString()}
+                ${calculateTotalPrice().toLocaleString()}
               </Text>
             </View>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate("Check Out Screen")}
+              onPress={() => checkOut()
+                }
               style={{
                 backgroundColor: colors.primary,
                 height: 64,
