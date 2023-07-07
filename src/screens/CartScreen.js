@@ -100,14 +100,13 @@ const CartScreen = ({navigation}) => {
   };
 
   const checkOut = () => {
-    setRandomNumber(getRandomNumbers(6).toString());
+    setRandomNumber((Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000).toString());
     addItemToArray(randomNumber, "orders");
     console.log('Value retrieved 1:', randomNumber);
     saveListDataToAsyncStorage(resultArray, randomNumber);
-
+  
     navigation.navigate("Check Out Screen", {randomNumber});
   };
-
   const deleteItemFromArrayAsyncStorage = async (elementName) => {
     try {
       // Retrieve the array from AsyncStorage
