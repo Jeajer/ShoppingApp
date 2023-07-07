@@ -13,11 +13,8 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
 
   const getListDataFromAsyncStorage = async () => {
     try {
-      // Lấy chuỗi JSON từ AsyncStorage
-      const jsonValue = await AsyncStorage.getItem(randomNumber);
-  
+      const jsonValue = await AsyncStorage.getItem(randomNumber.toString());
       if (jsonValue !== null) {
-        // Chuyển đổi chuỗi JSON thành mảng
         const listData = JSON.parse(jsonValue);
         console.log('List data retrieved from AsyncStorage:', listData);
         return listData;
@@ -25,8 +22,7 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
     } catch (error) {
       console.log('Error retrieving list data from AsyncStorage:', error);
     }
-  
-    return []; // Trả về một mảng rỗng nếu không có dữ liệu trong AsyncStorage
+    return [];
   };
 
   const fetchValue = async () => {
