@@ -94,6 +94,7 @@ const CartScreen = ({navigation}) => {
       const newList = [...resultArray];
       newList[index] = newItem;
       setResultArray(newList);
+
     }
   }
 
