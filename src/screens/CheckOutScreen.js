@@ -10,23 +10,20 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
   const {colors} = useTheme();
   const [resultArray, setResultArray] = useState([]);
 
-  // const getListDataFromAsyncStorage = async () => {
-  //   try {
-  //     // Lấy chuỗi JSON từ AsyncStorage
-  //     const jsonValue = await AsyncStorage.getItem(randomNumber);
-  
-  //     if (jsonValue !== null) {
-  //       // Chuyển đổi chuỗi JSON thành mảng
-  //       const listData = JSON.parse(jsonValue);
-  //       console.log('List data retrieved from AsyncStorage:', listData);
-  //       return listData;
-  //     }
-  //   } catch (error) {
-  //     console.log('Error retrieving list data from AsyncStorage:', error);
-  //   }
-  
-  //   return []; // Trả về một mảng rỗng nếu không có dữ liệu trong AsyncStorage
-  // };
+
+  const getListDataFromAsyncStorage = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(randomNumber.toString());
+      if (jsonValue !== null) {
+        const listData = JSON.parse(jsonValue);
+        console.log('List data retrieved from AsyncStorage:', listData);
+        return listData;
+      }
+    } catch (error) {
+      console.log('Error retrieving list data from AsyncStorage:', error);
+    }
+    return [];
+  };
 
   // const fetchValue = async () => {
   //   const data = await getListDataFromAsyncStorage();
