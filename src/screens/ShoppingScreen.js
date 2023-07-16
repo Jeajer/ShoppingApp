@@ -25,7 +25,7 @@ import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet
 import CustomBackdrop from "../components/CustomBackdrop";
 import FilterView from "../components/FilterView";
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
-import { doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 
 const CATEGORIES = [
   "Clothing",
@@ -33,15 +33,18 @@ const CATEGORIES = [
 ]
 
 const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg";
-const MESONARY_LIST_DATA = [];
-const SHOES_LIST_DATA = [];
+
 
 const ShoppingScreen = ({ navigation }) => {
   const { colors } = useTheme();
   const [categoryIndex, setCategoryIndex] = useState(0);
   const bottomSheetModalRef = useRef(null);
 
+  const MESONARY_LIST_DATA = [];
+  const SHOES_LIST_DATA = [];
+
   const user = FIREBASE_AUTH.currentUser;
+  const [favouriteString, setFavouriteString] = useState('');
 
   const [clothesCollection, setClothesCollection] = useState([])
   const [shoesCollection, setShoesCollection] = useState([])
@@ -63,6 +66,25 @@ const ShoppingScreen = ({ navigation }) => {
     collectionData.subImg = data.subImg;
 
     return collectionData
+  }
+
+  const handleAddToCart = async (item) => {
+      try {
+        await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid, "Carts", item.id), {
+          id: item.id,
+          description: item.description,
+          name: item.title,
+          price: item.price,
+          img: item.imageUrl,
+          color: item.color,
+          quantity: 1,
+        });
+      } catch (error) {
+        console.log(error.message)
+      } finally {
+        console.log('Successfully added')
+      }
+    alert('Successfully added')
   }
 
   useEffect(() => {
@@ -110,7 +132,17 @@ const ShoppingScreen = ({ navigation }) => {
       shoesQuery = SHOES_LIST_DATA;
       productQuery = MESONARY_LIST_DATA;
       setClothesCollection(productQuery);
-      setShoesCollection(shoesQuery)
+      setShoesCollection(shoesQuery);
+
+      let favouriteStr = '';
+
+      const favouriteSnap = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Favourite"));
+      if (favouriteSnap) {
+        favouriteSnap.forEach((doc) => {
+          favouriteStr = favouriteStr + doc.data().id + ' ';
+        });
+      }
+      setFavouriteString(favouriteStr)
     }
     fetchDoc();
   }, []);
@@ -336,6 +368,7 @@ const ShoppingScreen = ({ navigation }) => {
                       price: item.price,
                       name: item.title,
                       descripton: item.description,
+                      color: item.color,
                     });
                   }}
                 >
@@ -380,7 +413,7 @@ const ShoppingScreen = ({ navigation }) => {
                             alignItems: "center",
                             justifyContent: "center",
                           }}>
-                          <Icon name='heart-outline' size={20} color="#000" />
+                          <Icon name={!favouriteString.includes(item.id) ? 'heart-outline' : 'heart'} size={20} color={!favouriteString.includes(item.id) ? '#000' : 'red'} />
                         </View>
                       </View>
 
@@ -408,6 +441,7 @@ const ShoppingScreen = ({ navigation }) => {
                         </Text>
 
                         <TouchableOpacity
+                          onPress={() => {handleAddToCart(item)}}
                           style={{
                             paddingHorizontal: 16,
                             paddingVertical: 8,

@@ -5,128 +5,182 @@ import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
+import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
 
-const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
-  const {colors} = useTheme();
+
+const CheckOutScreen = ({ navigation }) => {
+  const { colors } = useTheme();
   const [resultArray, setResultArray] = useState([]);
+  const [userData, setUserData] = useState({});
 
-  // const getListDataFromAsyncStorage = async () => {
-  //   try {
-  //     // Lấy chuỗi JSON từ AsyncStorage
-  //     const jsonValue = await AsyncStorage.getItem(randomNumber);
-  
-  //     if (jsonValue !== null) {
-  //       // Chuyển đổi chuỗi JSON thành mảng
-  //       const listData = JSON.parse(jsonValue);
-  //       console.log('List data retrieved from AsyncStorage:', listData);
-  //       return listData;
-  //     }
-  //   } catch (error) {
-  //     console.log('Error retrieving list data from AsyncStorage:', error);
-  //   }
-  
-  //   return []; // Trả về một mảng rỗng nếu không có dữ liệu trong AsyncStorage
-  // };
+  const user = FIREBASE_AUTH.currentUser;
 
-  // const fetchValue = async () => {
-  //   const data = await getListDataFromAsyncStorage();
-  //   setResultArray(data);
-  // };
+  const removeFromCart = async (id) => {
+    try {
+      await deleteDoc(doc(FIREBASE_DB, "Users", user.uid, "Carts", id));
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
 
-  // useEffect(() => {
-  //   fetchValue();
-  // }, []);
+  const handleCheckout = async () => {
+    resultArray.forEach(async (item) => {
+      try {
+        await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid, "On Delivery", item.id), {
+          id: item.id,
+          description: item.description,
+          name: item.title,
+          price: item.price,
+          img: item.imageUrl,
+          color: item.color,
+          quantity: item.quantity,
+        });
+      } catch (error) {
+        console.log(error.message)
+      } finally {
+        console.log('Successfully added')
+        removeFromCart(item.id)
+      }
+    })
+    setResultArray([])
+    navigation.navigate("Success Order Screen")
+  }
 
   const calculateTotalPrice = () => {
     return resultArray.reduce((total, product) => total + product.price, 0);
   };
 
+  const fetchValue = async () => {
+    const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Carts"));
+    const docRef = doc(FIREBASE_DB, "Users", user.uid);
+    const docSnap = await getDoc(docRef);
+    let productQuery = Object.freeze({ name: "Score", points: 157 });
+    const listData = [];
+    const pCount = {};
+    querySnapshot.forEach((doc) => {
+      listData.push({
+        imageUrl: doc.data().img,
+        title: doc.data().name,
+        price: doc.data().price,
+        id: doc.id,
+        description: doc.data().description,
+        color: doc.data().color,
+        quantity: doc.data().quantity,
+      })
+    })
+
+    const userData = {};
+    if(docSnap.exists){
+      userData.address = docSnap.data().address;
+      userData.country = docSnap.data().country;
+      userData.displayName = docSnap.data().displayName;
+      userData.email = docSnap.data().email;
+      userData.img = docSnap.data().img;
+      userData.phone = docSnap.data().phone;
+    }
+    else {
+      console.log("No such document!");
+    }    
+    setUserData(userData);
+    productQuery = listData;
+    setResultArray(productQuery);
+  };
+
+  useEffect(() => {
+    fetchValue();
+  }, []);
+
   return (
     <SafeAreaView style={{
       paddingVertical: 24,
       gap: 40,
-      }}>
+    }}>
       <View style={{
-          paddingHorizontal: 24,
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexDirection: "row"
-        }}>
-          <TouchableOpacity
-           onPress={() => {navigation.goBack()}}>
-            <Icon name='chevron-left' size={30} color="#000"/>
-          </TouchableOpacity>
-          <Text style={{
-            fontSize: 24,
-            fontWeight: "700",
-          }}>Check out</Text>
-          <View style={{width: 30}}/>
+        paddingHorizontal: 24,
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexDirection: "row"
+      }}>
+        <TouchableOpacity
+          onPress={() => { navigation.goBack() }}>
+          <Icon name='chevron-left' size={30} color="#000" />
+        </TouchableOpacity>
+        <Text style={{
+          fontSize: 24,
+          fontWeight: "700",
+        }}>Check out</Text>
+        <View style={{ width: 30 }} />
       </View>
 
       <View style={{
         paddingHorizontal: 24,
-        gap: 10,        
+        gap: 10,
       }}>
-        <View 
-            style={{
-                flexDirection: "row",
-                justifyContent: "space-between"}}>
-            <Text style={{
-                fontSize: 18,
-                fontWeight: "600",
-                opacity: 0.5,
-                }}>
-                Shipping Address
-            </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between"
+          }}>
+          <Text style={{
+            fontSize: 18,
+            fontWeight: "600",
+            opacity: 0.5,
+          }}>
+            Shipping Address
+          </Text>
 
-            <TouchableOpacity>
-                <Icon name={'pencil-circle-outline'} size={30} color={colors.text}/>
-            </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon name={'pencil-circle-outline'} size={30} color={colors.text} />
+          </TouchableOpacity>
         </View>
 
-        <View 
+        <View
           style={{
             paddingHorizontal: 20,
             gap: 7
           }}>
           <Text
             style={{
-                fontSize: 18,
-                fontWeight: "600"}}>
-            Bruno Fernandes
+              fontSize: 18,
+              fontWeight: "600"
+            }}>
+            {user.displayName}
           </Text>
           <Text
             style={{
-                fontSize: 16,
-                fontWeight: "400",
-                opacity: 0.5}}>
-            25 rue Robert Latouche, Nice, 06200, Côte D’azur, France
+              fontSize: 16,
+              fontWeight: "400",
+              opacity: 0.5
+            }}>
+            {userData.address}, {userData.country}
           </Text>
         </View>
       </View>
-      
+
       <View style={{
         paddingHorizontal: 24,
-        gap: 10,        
+        gap: 10,
       }}>
-        <View 
-            style={{
-                flexDirection: "row",
-                justifyContent: "space-between"}}>
-            <Text style={{
-                fontSize: 18,
-                fontWeight: "600",
-                opacity: 0.5,
-                }}>
-                Payment
-            </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between"
+          }}>
+          <Text style={{
+            fontSize: 18,
+            fontWeight: "600",
+            opacity: 0.5,
+          }}>
+            Payment
+          </Text>
 
-            <TouchableOpacity>
-                <Icon name={'pencil-circle-outline'} size={30} color={colors.text}/>
-            </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon name={'pencil-circle-outline'} size={30} color={colors.text} />
+          </TouchableOpacity>
         </View>
 
-        <View 
+        <View
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -134,16 +188,17 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
             gap: 15,
 
           }}>
-          <Image 
-            source={{uri: "https://imageio.forbes.com/blogs-images/steveolenski/files/2016/07/Mastercard_new_logo-1200x865.jpg?format=jpg&width=1200"}}
+          <Image
+            source={{ uri: "https://imageio.forbes.com/blogs-images/steveolenski/files/2016/07/Mastercard_new_logo-1200x865.jpg?format=jpg&width=1200" }}
             resizeMode="contain"
             height={80}
             width={80}
-            style={{borderRadius: 24,}}/>
+            style={{ borderRadius: 24, }} />
           <Text
             style={{
-                fontSize: 16,
-                fontWeight: "500",}}>
+              fontSize: 16,
+              fontWeight: "500",
+            }}>
             **** **** **** 3947
           </Text>
         </View>
@@ -151,42 +206,44 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
 
       <View style={{
         paddingHorizontal: 24,
-        gap: 10,        
+        gap: 10,
       }}>
-        <View 
-            style={{
-                flexDirection: "row",
-                justifyContent: "space-between"}}>
-            <Text style={{
-                fontSize: 18,
-                fontWeight: "600",
-                opacity: 0.5,
-                }}>
-                Delivery Method
-            </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between"
+          }}>
+          <Text style={{
+            fontSize: 18,
+            fontWeight: "600",
+            opacity: 0.5,
+          }}>
+            Delivery Method
+          </Text>
 
-            <TouchableOpacity>
-                <Icon name={'pencil-circle-outline'} size={30} color={colors.text}/>
-            </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon name={'pencil-circle-outline'} size={30} color={colors.text} />
+          </TouchableOpacity>
         </View>
 
-        <View 
+        <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             paddingHorizontal: 20,
             gap: 15
           }}>
-          <Image 
-            source={{uri: "https://i.ytimg.com/vi/Wu83TlJk2og/maxresdefault.jpg"}}
+          <Image
+            source={{ uri: "https://i.ytimg.com/vi/Wu83TlJk2og/maxresdefault.jpg" }}
             resizeMode="contain"
             height={80}
             width={80}
-            style={{borderRadius: 24,}}/>
+            style={{ borderRadius: 24, }} />
           <Text
             style={{
-                fontSize: 16,
-                fontWeight: "500",}}>
+              fontSize: 16,
+              fontWeight: "500",
+            }}>
             Fast (2-3 days)
           </Text>
         </View>
@@ -198,7 +255,7 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
           gap: 10,
           marginTop: 10
         }}>
-        <View 
+        <View
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -221,7 +278,7 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
           </Text>
         </View>
 
-        <View 
+        <View
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -244,7 +301,7 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
           </Text>
         </View>
 
-        <View 
+        <View
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -267,53 +324,53 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
           </Text>
         </View>
 
-        
+
       </View>
 
-      <View 
+      <View
+        style={{
+          paddingHorizontal: 30,
+          marginTop: 5,
+        }}>
+
+        <TouchableOpacity
+          onPress={() => { handleCheckout() }}
+          style={{
+            backgroundColor: colors.primary,
+            height: 64,
+            borderRadius: 64,
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexDirection: "row",
+            padding: 12,
+          }}
+        >
+          <View />
+          <Text
             style={{
-              paddingHorizontal: 30,
-              marginTop: 5,
-            }}> 
+              fontSize: 16,
+              fontWeight: "600",
+              color: colors.background,
+            }}
+          >
+            SUBMIT ORDER
+          </Text>
 
-            <TouchableOpacity
-              onPress={() => {navigation.navigate("Success Order Screen")}}
-              style={{
-                backgroundColor: colors.primary,
-                height: 64,
-                borderRadius: 64,
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexDirection: "row",
-                padding: 12,
-              }}
-            >
-                <View/>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: colors.background,
-                }}
-              >
-                SUBMIT ORDER
-              </Text>
+          <View
+            style={{
+              backgroundColor: colors.card,
+              width: 40,
+              aspectRatio: 1,
+              borderRadius: 40,
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+            <Icon name={"arrow-right"} size={24} color={colors.text} />
+          </View>
+        </TouchableOpacity>
 
-              <View
-                style={{
-                  backgroundColor: colors.card,
-                  width: 40,
-                  aspectRatio: 1,
-                  borderRadius: 40,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}>
-                <Icon name={"arrow-right"} size={24} color={colors.text} />
-              </View>
-            </TouchableOpacity>
-          
-        </View>    
-      
+      </View>
+
     </SafeAreaView>
   );
 };
