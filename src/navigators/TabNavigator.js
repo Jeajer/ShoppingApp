@@ -9,6 +9,7 @@ import FavoriteScreen from "../screens/FavoriteScreen";
 import CustomBottomTab from "../components/CustomBottomTab";
 import Login from '../screens/Login';
 import ProfileNavigator from './AuthNavigator';
+import FavouriteNavigator from './Favourite';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,7 +33,7 @@ const TabsNavigator = () => {
                         return <Icon size={24} color="black" name="shopping" />}
                     }}/>
         <Tab.Screen name="Favorite" 
-                    component={FavoriteScreen} 
+                    component={FavouriteNavigator} 
                     options={{
                       tabBarIcon(props) {
                         return <Icon size={24} color="black" name="heart" />},

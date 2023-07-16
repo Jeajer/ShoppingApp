@@ -5,11 +5,11 @@ import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
   const {colors} = useTheme();
   const [resultArray, setResultArray] = useState([]);
+
 
   const getListDataFromAsyncStorage = async () => {
     try {
@@ -25,14 +25,14 @@ const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
     return [];
   };
 
-  const fetchValue = async () => {
-    const data = await getListDataFromAsyncStorage();
-    setResultArray(data);
-  };
+  // const fetchValue = async () => {
+  //   const data = await getListDataFromAsyncStorage();
+  //   setResultArray(data);
+  // };
 
-  useEffect(() => {
-    fetchValue();
-  }, []);
+  // useEffect(() => {
+  //   fetchValue();
+  // }, []);
 
   const calculateTotalPrice = () => {
     return resultArray.reduce((total, product) => total + product.price, 0);
