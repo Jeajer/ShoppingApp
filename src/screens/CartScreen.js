@@ -6,36 +6,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
+import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
 
-const listData = [
-  {
-    id: "AR4162-105",
-    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f9e7b076-da72-419c-aaf5-86c8a2785cbb/pico-5-shoes-QQ5g1N.png",
-    price: 30,
-    quantity: 1,
-    name: "Nike Air Pegasus",
-    color: "pink",
-    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
-  },
-  {
-    id: "DV2992-010",
-    price: 50,
-    quantity: 1,
-    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5e169c19-b550-4fb8-bf7e-d49847554fd3/dri-fit-aerobill-legacy91-camo-training-cap-rc1zZQ.png",
-    name: "The Nike Pico 5",
-    color: "black",
-    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
-  },
-  {
-    id: "FB8137-010",
-    price: 70,
-    quantity: 1,
-    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/88e428f8-70de-48b3-a245-c4851c577f9f/sb-skate-t-shirt-g49c6j.png",
-    name: "The Nike Pico 5",
-    color: "black",
-    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
-  },
-];
+
 
 const CartScreen = ({navigation}) => {
   const {colors} = useTheme();
@@ -45,6 +19,9 @@ const CartScreen = ({navigation}) => {
   const [count, setCount] = useState(1);
   const [text, onChangeText] = useState('');
   const [randomNumber, setRandomNumber] = useState(0);
+
+  const user = FIREBASE_AUTH.currentUser;
+  const listData = [];
 
   const [resultArray, setResultArray] = useState([]);
 
@@ -81,117 +58,70 @@ const CartScreen = ({navigation}) => {
     }
   };
 
-  const deleteRow = (rowMap, rowKey) => {
+  const removeFromFavourite = async (id) => {
+    try {
+      await deleteDoc(doc(FIREBASE_DB, "Users", user.uid, "Carts", id));
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
+  const deleteRow = (rowMap, rowKey, id) => {
     closeRow(rowMap, rowKey);
     const newData = [...resultArray];
-    const prevIndex = resultArray.findIndex(item => item.key === rowKey);  
-    deleteItemFromArrayAsyncStorage(resultArray[prevIndex].id);
+    const prevIndex = resultArray.findIndex(item => item.key === rowKey);
+    removeFromFavourite(id);
     newData.splice(prevIndex, 1);
     setResultArray(newData);
   };
 
-  const getRandomNumbers = (n) => {
-    const numbers = [];
-    for (let i = 0; i < n; i++) {
-      const ran = Math.floor(Math.random() * 10); // Lấy giá trị ngẫu nhiên từ 0 đến 9
-      numbers.push(ran);
-    }
-    return numbers;
-  };
+  const handlePlusQuan = async (rowKey, rowMap) => {
+    const index = resultArray.findIndex(item => item.id === rowKey);
+    const item = resultArray[index];
+    const newQuantity = item.quantity + 1;
+    const newItem = { ...item, quantity: newQuantity };
+    const newList = [...resultArray];
+    newList[index] = newItem;
+    setResultArray(newList);
+  }
 
-  const checkOut = () => {
-    setRandomNumber((Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000).toString());
-    addItemToArray(randomNumber, "orders");
-    console.log('Value retrieved 1:', randomNumber);
-    saveListDataToAsyncStorage(resultArray, randomNumber);
-  
-    navigation.navigate("Check Out Screen", {randomNumber});
-  };
-  const deleteItemFromArrayAsyncStorage = async (elementName) => {
-    try {
-      // Retrieve the array from AsyncStorage
-      const jsonValue = await AsyncStorage.getItem("carts");
-      let updatedArray = [];
-  
-      if (jsonValue !== null) {
-        // Parse the array from JSON
-        updatedArray = JSON.parse(jsonValue);
-  
-        // Remove items with the specified name value
-        updatedArray = updatedArray.filter(item => item !== elementName);
-      }
-  
-      // Save the updated array back to AsyncStorage
-      await AsyncStorage.setItem("carts", JSON.stringify(updatedArray));
-  
-      console.log('Items deleted from the array in AsyncStorage');
-    } catch (error) {
-      console.log('Error deleting items from the array in AsyncStorage:', error);
+  const handleMinusQuan = async (rowKey, rowMap) => {
+    const index = resultArray.findIndex(item => item.id === rowKey);
+    const item = resultArray[index];
+    if (item.quantity > 1) {
+      const newQuantity = item.quantity - 1;
+      const newItem = { ...item, quantity: newQuantity };
+      const newList = [...resultArray];
+      newList[index] = newItem;
+      setResultArray(newList);
+
     }
   }
 
-  const saveListDataToAsyncStorage = async (list, key) => {
-    try {
-      // Chuyển đổi mảng thành chuỗi JSON
-      const jsonValue = JSON.stringify(list);
-      
-      // Lưu chuỗi JSON vào AsyncStorage
-      await AsyncStorage.setItem(key, jsonValue);
-  
-      console.log('List data saved to AsyncStorage');
-    } catch (error) {
-      console.log('Error saving list data to AsyncStorage:', error);
-    }
+  const checkOut = () => {
+    navigation.navigate("Check Out Screen");
   };
 
-  const addItemToArray = async (item, key) => {
-    try {
-      // Retrieve the array from AsyncStorage
-      const existingArray = await AsyncStorage.getItem(key);
-      let updatedArray = [];
   
-      if (existingArray !== null) {
-        // If the array exists, parse it from JSON and update it
-        updatedArray = JSON.parse(existingArray);
-      }
-  
-      // Add the new item to the array
-      updatedArray.push(item);
-  
-      // Save the updated array back to AsyncStorage
-      await AsyncStorage.setItem(key, JSON.stringify(updatedArray));
-  
-      console.log('Item added to the array successfully!');
-    } catch (error) {
-      console.log('Error adding item to the array:', error);
-    }
-  };
-
-  const getValueFromAsyncStorage = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('carts');
-      if (jsonValue !== null) {
-        const value = JSON.parse(jsonValue);
-        console.log('Value retrieved from AsyncStorage:', value);
-        return value;
-      } else {
-        console.log('Value not found in AsyncStorage');
-        return null;
-      }
-    } catch (error) {
-      console.log('Error retrieving value from AsyncStorage:', error);
-      return null;
-    }
-  };
 
   const fetchValue = async () => {
-    const retrievedValue = await getValueFromAsyncStorage();
-    const newArray = retrievedValue ? [...retrievedValue] : [];
-
-    const matchingElements = listData.filter((element) =>
-    newArray.includes(element.id)
-    );
-    setResultArray(matchingElements);
+    const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Carts"));
+    let productQuery = Object.freeze({ name: "Score", points: 157 });
+    const listData = [];
+    const pCount = {};
+    querySnapshot.forEach((doc) => {
+      listData.push({
+        imageUrl: doc.data().img,
+        title: doc.data().name,
+        price: doc.data().price,
+        id: doc.id,
+        description: doc.data().description,
+        color: doc.data().color,
+        quantity: doc.data().quantity,
+      })
+    })
+    productQuery = listData;
+    setResultArray(productQuery);
   };
 
   useEffect(() => {
@@ -298,7 +228,7 @@ const CartScreen = ({navigation}) => {
                       padding: 6,
                       borderRadius: 100,}}>
                     <TouchableOpacity
-                      onPress={() => setCount((count) => Math.max(1, count - 1))}
+                      onPress={() => {handleMinusQuan(data.item.id, rowMap)}}
                       style={{
                         backgroundColor: colors.card,
                         width: 24,
@@ -316,7 +246,7 @@ const CartScreen = ({navigation}) => {
                         color: colors.background
                       }}>{data.item.quantity}</Text>
                     <TouchableOpacity
-                      onPress={() => QuantityPlus(data.item.id)}
+                      onPress={() => handlePlusQuan(data.item.id, rowMap)}
                       style={{
                         backgroundColor: colors.card,
                         width: 24,
@@ -358,7 +288,7 @@ const CartScreen = ({navigation}) => {
                 backgroundColor: "red",
                 borderRadius: 24,}}>
                 <TouchableOpacity 
-                  onPress={() => deleteRow(rowMap, data.item.key)}
+                  onPress={() => deleteRow(rowMap, data.item.key, data.item.id)}
                   style={{
                   alignSelf: "flex-end",
                   alignItems: "center",
