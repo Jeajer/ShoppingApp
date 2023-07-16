@@ -5,38 +5,37 @@ import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CheckOutScreen = ({navigation, route: {params: {randomNumber}}}) => {
   const {colors} = useTheme();
   const [resultArray, setResultArray] = useState([]);
 
-  const getListDataFromAsyncStorage = async () => {
-    try {
-      // Lấy chuỗi JSON từ AsyncStorage
-      const jsonValue = await AsyncStorage.getItem(randomNumber);
+  // const getListDataFromAsyncStorage = async () => {
+  //   try {
+  //     // Lấy chuỗi JSON từ AsyncStorage
+  //     const jsonValue = await AsyncStorage.getItem(randomNumber);
   
-      if (jsonValue !== null) {
-        // Chuyển đổi chuỗi JSON thành mảng
-        const listData = JSON.parse(jsonValue);
-        console.log('List data retrieved from AsyncStorage:', listData);
-        return listData;
-      }
-    } catch (error) {
-      console.log('Error retrieving list data from AsyncStorage:', error);
-    }
+  //     if (jsonValue !== null) {
+  //       // Chuyển đổi chuỗi JSON thành mảng
+  //       const listData = JSON.parse(jsonValue);
+  //       console.log('List data retrieved from AsyncStorage:', listData);
+  //       return listData;
+  //     }
+  //   } catch (error) {
+  //     console.log('Error retrieving list data from AsyncStorage:', error);
+  //   }
   
-    return []; // Trả về một mảng rỗng nếu không có dữ liệu trong AsyncStorage
-  };
+  //   return []; // Trả về một mảng rỗng nếu không có dữ liệu trong AsyncStorage
+  // };
 
-  const fetchValue = async () => {
-    const data = await getListDataFromAsyncStorage();
-    setResultArray(data);
-  };
+  // const fetchValue = async () => {
+  //   const data = await getListDataFromAsyncStorage();
+  //   setResultArray(data);
+  // };
 
-  useEffect(() => {
-    fetchValue();
-  }, []);
+  // useEffect(() => {
+  //   fetchValue();
+  // }, []);
 
   const calculateTotalPrice = () => {
     return resultArray.reduce((total, product) => total + product.price, 0);

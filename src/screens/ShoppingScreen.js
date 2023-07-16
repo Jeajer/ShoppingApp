@@ -25,7 +25,7 @@ import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet
 import CustomBackdrop from "../components/CustomBackdrop";
 import FilterView from "../components/FilterView";
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 
 const CATEGORIES = [
   "Clothing",
@@ -33,38 +33,8 @@ const CATEGORIES = [
 ]
 
 const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg";
-const MESONARY_LIST_DATA = [
-  {
-    imageUrl:
-      "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a5db19b7-dd9a-4e7d-8249-77223324c09f/life-woven-military-short-sleeve-button-down-shirt-4hD9x8.png",
-    title: "PUMA 1",
-    price: 160,
-  },
-  {
-    imageUrl:
-      "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/a6106db6-e16c-4de9-9407-be02a10da88b/sportswear-everyday-modern-woven-short-sleeve-top-hRTvkd.png",
-    title: "PUMA 2",
-    price: 180,
-  },
-  {
-    imageUrl:
-      "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/0440d244-bff7-4fdf-aab3-cbd00c5d05c7/sportswear-team-nike-short-sleeve-top-l77Dq3.png",
-    title: "PUMA 3",
-    price: 200,
-  },
-  {
-    imageUrl:
-      "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/7e7db949-aadc-435e-a709-abb1deac22f7/golf-t-shirt-f1pqcz.png",
-    title: "PUMA 4",
-    price: 180,
-  },
-  {
-    imageUrl:
-      "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/e42dbedf-8a3a-4f94-be8d-eef8567e4423/sportswear-icon-clash-short-sleeve-tie-top-GdbMh0.png",
-    title: "PUMA 5",
-    price: 120,
-  },
-];
+const MESONARY_LIST_DATA = [];
+const SHOES_LIST_DATA = [];
 
 const ShoppingScreen = ({ navigation }) => {
   const { colors } = useTheme();
@@ -73,48 +43,91 @@ const ShoppingScreen = ({ navigation }) => {
 
   const user = FIREBASE_AUTH.currentUser;
 
-  const [newCollection, setNewCollection] = useState('')
+  const [clothesCollection, setClothesCollection] = useState([])
+  const [shoesCollection, setShoesCollection] = useState([])
 
- 
-  const usersRef = collection(FIREBASE_DB, 'Appdata');
+  const [newCollection1, setNewCollection1] = useState({});
+  const [newCollection2, setNewCollection2] = useState({});
+  const [newCollection3, setNewCollection3] = useState({});
 
-  // Retrieve the documents in the collection
-  
-  const handleMoveToDetail = async(id) => {
-    const q = query(collection(FIREBASE_DB, "AppData", "Hot", "newCollection"), where("id", "==", id));
+  const getData = (data) => {
+    const collectionData = {};
+    collectionData.category = data.category;
+    collectionData.color = data.color;
+    collectionData.description = data.description;
+    collectionData.id = data.id;
+    collectionData.img = data.img;
+    collectionData.name = data.name;
+    collectionData.price = data.price;
+    collectionData.index = data.index;
+    collectionData.subImg = data.subImg;
 
-    let name, descripton = '';
-    let price = 0;
-    let img = '';
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, " => ", doc.data().name);
-      // name = doc.data().name;
-      // descripton = doc.data().descripton;
-      // price = doc.data().price;
-      // img = doc.data().img;
-    });
-    navigation.navigate("Details Screen", {
-      id: id,
-      name: name,
-      descripton: descripton,
-      price: price,
-      img: img,
-    });
+    return collectionData
   }
 
-  const handle = async() => {
-    const docRef = doc(FIREBASE_DB, "AppData", "Hot", "newCollection", "AR4162-105");
-    const docSnap = await getDoc(docRef);
+  useEffect(() => {
+    const fetchDoc = async () => {
+      const querySnapshot = await getDocs(collection(FIREBASE_DB, "Products"));
+      const newQuerySnapshot = await getDocs(collection(FIREBASE_DB, "New Collections"));
+      let productQuery = Object.freeze({ name: "Score", points: 157 });
+      let shoesQuery = Object.freeze({ name: "Score", points: 157 });
 
-    if (docSnap.exists()) {
-      
-      console.log("Document data:", docSnap.data());
-    } else {
-      // docSnap.data() will be undefined in this case
-      console.log("No such document!");
+      querySnapshot.forEach((doc) => {
+        if (doc.data().category === 'clothes') {
+          MESONARY_LIST_DATA.push({
+            imageUrl: doc.data().img,
+            title: doc.data().name,
+            price: doc.data().price,
+            id: doc.id,
+            description: doc.data().description,    
+            color: doc.data().color,        
+          });
+        } else {
+          SHOES_LIST_DATA.push({
+            imageUrl: doc.data().img,
+            title: doc.data().name,
+            price: doc.data().price,
+            id: doc.id,
+            description: doc.data().description,
+            color: doc.data().color,
+          });
+        }
+      });
+
+      newQuerySnapshot.forEach((doc) => {
+        if (doc.data().index === 1) {
+          const collectionData = getData(doc.data());
+          setNewCollection1(collectionData);
+        } else if (doc.data().index === 2) {
+          const collectionData = getData(doc.data());
+          setNewCollection2(collectionData);
+        } else if (doc.data().index === 3) {
+          const collectionData = getData(doc.data());
+          setNewCollection3(collectionData);
+        }
+      })
+
+      shoesQuery = SHOES_LIST_DATA;
+      productQuery = MESONARY_LIST_DATA;
+      setClothesCollection(productQuery);
+      setShoesCollection(shoesQuery)
     }
+    fetchDoc();
+  }, []);
+
+  const handleCategory = async () => { }
+
+  // Retrieve the documents in the collection
+
+  const handle = async () => {
+    const q = query(collection(FIREBASE_DB, "Products"), where("category", "==", "clothes"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const clothes = [];
+      querySnapshot.forEach((doc) => {
+        clothes.push(doc.data().name);
+      });
+      console.log("Current products as clothes: ", clothes.join(", "));
+    });
   }
 
   const openFilterModal = useCallback(() => {
@@ -137,7 +150,7 @@ const ShoppingScreen = ({ navigation }) => {
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 6, color: colors.text }}>
               {/* Hi, {user.displayName} 👋 */}
-              Hi 👋
+              Hi {user ? user.displayName : 'Guest'} 👋
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>
@@ -154,8 +167,8 @@ const ShoppingScreen = ({ navigation }) => {
               borderWidth: 1,
               borderColor: colors.border
             }}
-            onPress={() => {handle()}}
-            >
+            onPress={() => { handle() }}
+          >
             <Icon name="bell" size={24} color={colors.text} />
           </TouchableOpacity>
         </View>
@@ -219,47 +232,50 @@ const ShoppingScreen = ({ navigation }) => {
             {/* Card */}
             <Card
               onPress={() => {
-                navigation.navigate("Details Screen",{
-                  id: "AR4162-105",
-                  imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f9e7b076-da72-419c-aaf5-86c8a2785cbb/pico-5-shoes-QQ5g1N.png",
-                  price: 30,
-                  name: "Nike Air Pegasus",
-                  descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
-                });  
-              }}  
-              id = "AR4162-105"
-              imageUrl = "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f9e7b076-da72-419c-aaf5-86c8a2785cbb/pico-5-shoes-QQ5g1N.png"
-              price = {30}         
+                navigation.navigate("Details Screen", {
+                  id: newCollection1.id,
+                  imageUrl: newCollection1.subImg,
+                  price: newCollection1.price,
+                  name: newCollection1.name,
+                  descripton: newCollection1.description,
+                  color: newCollection1.color,
+                });
+              }}
+              id={newCollection1.id}
+              imageUrl={newCollection1.img}
+              price={newCollection1.price}
             />
 
             <View style={{ flex: 1, gap: 12 }}>
               <Card
                 onPress={() => {
                   navigation.navigate("Details Screen", {
-                    id: "DV2992-010",
-                    price: 50,
-                    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5e169c19-b550-4fb8-bf7e-d49847554fd3/dri-fit-aerobill-legacy91-camo-training-cap-rc1zZQ.png",
-                    name: "The Nike Pico 5",
-                    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
+                    id: newCollection2.id,
+                    imageUrl: newCollection2.subImg,
+                    price: newCollection2.price,
+                    name: newCollection2.name,
+                    descripton: newCollection2.description,
+                    color: newCollection2.color,
                   });
                 }}
-                i = "DV2992-010"
-                price = {50}
-                imageUrl = "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5e169c19-b550-4fb8-bf7e-d49847554fd3/dri-fit-aerobill-legacy91-camo-training-cap-rc1zZQ.png"
+                id={newCollection2.id}
+                price={newCollection2.price}
+                imageUrl={newCollection2.img}
               />
               <Card
                 onPress={() => {
                   navigation.navigate("Details Screen", {
-                    id: "FB8137-010",
-                    price: 70,
-                    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/88e428f8-70de-48b3-a245-c4851c577f9f/sb-skate-t-shirt-g49c6j.png",
-                    name: "The Nike Pico 5",
-                    descripton: "Baggy, comfy, cool, what's it to you? This roomy, everyday tee features an all-over tie-dye effect, adding a seasonal touch to your 'fit."
+                    id: newCollection3.id,
+                    imageUrl: newCollection3.subImg,
+                    price: newCollection3.price,
+                    name: newCollection3.name,
+                    descripton: newCollection3.description,
+                    color: newCollection3.color,
                   });
                 }}
-                id='FB8137-010'
-                price={70}
-                imageUrl="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/88e428f8-70de-48b3-a245-c4851c577f9f/sb-skate-t-shirt-g49c6j.png"
+                id={newCollection3.id}
+                price={newCollection3.price}
+                imageUrl={newCollection3.img}
               />
             </View>
           </View>
@@ -305,95 +321,106 @@ const ShoppingScreen = ({ navigation }) => {
 
         {/* MasonryList */}
         <MasonryList
-          data={MESONARY_LIST_DATA}
-          keyExtractor={item => item}
+          data={categoryIndex === 0 ? clothesCollection : shoesCollection}
           numColumns={2}
           contentContainerStyle={{ paddingHorizontal: 16 }}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, i }) => {
             return (
               <View style={{ padding: 6 }}>
-                <View
-                  style={{
-                    aspectRatio: i === 0 ? 1 : 2 / 3,
-                    position: "relative",
-                    overflow: "hidden",
-                    backgroundColor: colors.background,
-                    borderRadius: 24,
-                  }}>
-                  <Image
-                    source={{ uri: item.imageUrl }}
-                    resizeMode="cover"
-                    style={StyleSheet.absoluteFill} />
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Details Screen", {
+                      id: item.id,
+                      imageUrl: item.imageUrl,
+                      price: item.price,
+                      name: item.title,
+                      descripton: item.description,
+                    });
+                  }}
+                >
+                  <View
+                    style={{
+                      aspectRatio: i === 0 ? 1 : 2 / 3,
+                      position: "relative",
+                      overflow: "hidden",
+                      backgroundColor: colors.background,
+                      borderRadius: 24,
+                    }}>
+                    <Image
+                      source={{ uri: item.imageUrl }}
+                      resizeMode="cover"
+                      style={StyleSheet.absoluteFill} />
 
-                  <View style={[StyleSheet.absoluteFill,
-                  { padding: 12, }]
-                  }>
-                    <View style={{ flexDirection: "row", gap: 8, padding: 4 }}>
-                      <Text
-                        style={{
-                          flex: 1,
-                          fontSize: 16,
-                          fontWeight: "600",
-                          color: colors.text,
-                          textShadowColor: "rgba(0,0,0,0.2)",
-                          textShadowOffset: {
-                            height: 1,
-                            width: 0,
-                          },
-                          textShadowRadius: 4,
-                        }}>
-                        {item.title}
-                      </Text>
-                      <View
-                        style={{
-                          backgroundColor: colors.background,
-                          borderRadius: 100,
-                          height: 32,
-                          aspectRatio: 1,
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}>
-                        <Icon name='heart-outline' size={20} color="#000" />
+                    <View style={[StyleSheet.absoluteFill,
+                    { padding: 12, }]
+                    }>
+                      <View style={{ flexDirection: "row", gap: 8, padding: 4 }}>
+                        <Text
+                          style={{
+                            flex: 1,
+                            fontSize: 16,
+                            fontWeight: "600",
+                            color: colors.text,
+                            textShadowColor: "rgba(0,0,0,0.2)",
+                            textShadowOffset: {
+                              height: 1,
+                              width: 0,
+                            },
+                            textShadowRadius: 4,
+                          }}>
+                          {item.title}
+                        </Text>
+                        <View
+                          style={{
+                            backgroundColor: colors.background,
+                            borderRadius: 100,
+                            height: 32,
+                            aspectRatio: 1,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}>
+                          <Icon name='heart-outline' size={20} color="#000" />
+                        </View>
                       </View>
-                    </View>
 
-                    <View style={{ flex: 1, }} />
-                    <BlurView
-                      style={{
-                        flexDirection: "row",
-                        backgroundColor: "rgba(0, 0, 0, 0.45)",
-                        alignItems: "center",
-                        padding: 8,
-                        borderRadius: 100,
-                        overflow: "hidden"
-                      }}
-                      intensity={20}>
-                      <Text
+                      <View style={{ flex: 1, }} />
+                      <BlurView
                         style={{
-                          flex: 1,
-                          fontSize: 16,
-                          fontWeight: "600",
-                          color: "#fff",
-                          marginLeft: 8,
-                        }}
-                        numberOfLines={1}>
-                        ${item.price}
-                      </Text>
-
-                      <TouchableOpacity
-                        style={{
-                          paddingHorizontal: 16,
-                          paddingVertical: 8,
+                          flexDirection: "row",
+                          backgroundColor: "rgba(0, 0, 0, 0.45)",
+                          alignItems: "center",
+                          padding: 8,
                           borderRadius: 100,
-                          backgroundColor: "#fff"
-                        }}>
-                        <Icon name="basket-outline" size={20} color="#000" />
-                      </TouchableOpacity>
-                    </BlurView>
+                          overflow: "hidden"
+                        }}
+                        intensity={20}>
+                        <Text
+                          style={{
+                            flex: 1,
+                            fontSize: 16,
+                            fontWeight: "600",
+                            color: "#fff",
+                            marginLeft: 8,
+                          }}
+                          numberOfLines={1}>
+                          ${item.price}
+                        </Text>
 
+                        <TouchableOpacity
+                          style={{
+                            paddingHorizontal: 16,
+                            paddingVertical: 8,
+                            borderRadius: 100,
+                            backgroundColor: "#fff"
+                          }}>
+                          <Icon name="basket-outline" size={20} color="#000" />
+                        </TouchableOpacity>
+                      </BlurView>
+
+                    </View>
                   </View>
-                </View>
+                </TouchableOpacity>                
               </View>);
           }}
           onEndReachedThreshold={0.1}
@@ -421,11 +448,6 @@ const Card = ({
   imageUrl,
   id,
   onPress
-}: {
-  price: number;
-  imageUrl: string;
-  id: string;
-  onPress: () => void;
 }) => {
   return (
     <TouchableOpacity
