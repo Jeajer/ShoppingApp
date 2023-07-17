@@ -53,6 +53,23 @@ const ShoppingScreen = ({ navigation }) => {
   const [newCollection2, setNewCollection2] = useState({});
   const [newCollection3, setNewCollection3] = useState({});
 
+  const [customer, setCustomer] = useState([]);
+
+  useEffect(() => {
+    if(user)
+    {
+      const unsub = onSnapshot(doc(FIREBASE_DB, "Users", user.uid), (doc) => {
+        const orderData = doc.data();
+        setCustomer(orderData);
+        console.log(customer);
+      }); 
+
+      return () => {
+        unsub();
+      }; 
+    }
+  }, []);
+
   const getData = (data) => {
     const collectionData = {};
     collectionData.category = data.category;
@@ -174,13 +191,13 @@ const ShoppingScreen = ({ navigation }) => {
           alignItems: "center",
           gap: 8
         }}>
-          <Image source={{ uri: AVATAR_URL }}
+          <Image source={{ uri: customer.img ? customer.img : AVATAR_URL }}
             style={{ width: 52, aspectRatio: 1, borderRadius: 52 }}
             resizeMode="cover" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 6, color: colors.text }}>
               {/* Hi, {user.displayName} 👋 */}
-              Hi {user ? user.displayName : 'Guest'} 👋
+              Hi, {customer.displayName ? customer.displayName : 'Guest'} 👋
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>

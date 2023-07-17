@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import firebase from 'firebase/compat/app';
+import { getStorage } from "firebase/storage";
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore'
 
@@ -20,6 +21,7 @@ const FIREBASE_APP = initializeApp(firebaseConfig);
 const FIREBASE_DB = getFirestore(FIREBASE_APP);
 const FIREBASE_PROVIDER = new GoogleAuthProvider();
 const FIREBASE_AUTH = getAuth(FIREBASE_APP);
+const FIREBASE_STORAGE = getStorage(FIREBASE_APP);
 
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
