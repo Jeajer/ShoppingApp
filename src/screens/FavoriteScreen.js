@@ -7,15 +7,20 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
-import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { 
+  doc, 
+  setDoc, 
+  getDoc, 
+  collection, 
+  query,
+  where, 
+  getDocs, 
+  deleteDoc, 
+  updateDoc 
+} from 'firebase/firestore';
 
 const FavoriteScreen = ({ navigation }) => {
   const { colors } = useTheme();
-
-  const [product, setProduct] = useState();
-  const [total, setTotal] = useState(null);
-  const [count, setCount] = useState(1);
-  const [text, onChangeText] = useState('');
 
   const [resultArray, setResultArray] = useState([]);
 
@@ -29,54 +34,79 @@ const FavoriteScreen = ({ navigation }) => {
     }
   };
 
-  const deleteRow = (rowMap, rowKey) => {
+  const removeFromFavourite = async (id) => {
+    try {
+      await deleteDoc(doc(FIREBASE_DB, "Users", user.uid, "Favourite", id));
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
+  const deleteRow = async (rowMap, rowKey, id) => {
     closeRow(rowMap, rowKey);
     const newData = [...resultArray];
     const prevIndex = resultArray.findIndex(item => item.key === rowKey);
-    deleteItemFromArrayAsyncStorage(resultArray[prevIndex].id);
+    removeFromFavourite(id);
     newData.splice(prevIndex, 1);
     setResultArray(newData);
   };
 
-  const deleteItemFromArrayAsyncStorage = async (elementName) => {
-    try {
-      // Retrieve the array from AsyncStorage
-      const jsonValue = await AsyncStorage.getItem("favorites");
-      let updatedArray = [];
-
-      if (jsonValue !== null) {
-        // Parse the array from JSON
-        updatedArray = JSON.parse(jsonValue);
-
-        // Remove items with the specified name value
-        updatedArray = updatedArray.filter(item => item !== elementName);
-      }
-
-      // Save the updated array back to AsyncStorage
-      await AsyncStorage.setItem("favorites", JSON.stringify(updatedArray));
-
-      console.log('Items deleted from the array in AsyncStorage');
-    } catch (error) {
-      console.log('Error deleting items from the array in AsyncStorage:', error);
+  const handleAddToCart = async () => {
+    if(resultArray.length === 0){      
+      alert('Please select your favourite first!')
+    }
+    else {
+      resultArray.forEach(async (item) => {
+        try {
+          await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid, "Carts", item.id), {
+            id: item.id,
+            description: item.description,
+            name: item.title,
+            price: item.price,
+            img: item.imageUrl,
+            color: item.color,
+            quantity: item.quantity,
+          });
+        } catch (error) {
+          console.log(error.message)
+        } finally {
+          console.log('Successfully added')
+          removeFromFavourite(item.id)
+        }
+      })
+      setResultArray([])
+      navigation.navigate("Cart Screen")
     }
   }
 
-  const getValueFromAsyncStorage = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('favorites');
-      if (jsonValue !== null) {
-        const value = JSON.parse(jsonValue);
-        console.log('Value retrieved from Favorite:', value);
-        return value;
-      } else {
-        console.log('Value not found in AsyncStorage');
-        return null;
-      }
-    } catch (error) {
-      console.log('Error retrieving value from AsyncStorage:', error);
-      return null;
-    }
+  const handlePlusQuan = async (rowKey, rowMap) => {
+    const index = resultArray.findIndex(item => item.id === rowKey);
+    const item = resultArray[index];
+    const newQuantity = item.quantity + 1;
+    const newItem = { ...item, quantity: newQuantity };
+    const newList = [...resultArray];
+    newList[index] = newItem;
+    setResultArray(newList);
+  }
+
+  const handleMinusQuan = async (rowKey, rowMap) => {
+    const index = resultArray.findIndex(item => item.id === rowKey);
+    const item = resultArray[index];
+    if(item.quantity > 1){
+      const newQuantity = item.quantity - 1;
+      const newItem = { ...item, quantity: newQuantity };
+      const newList = [...resultArray];
+      newList[index] = newItem;
+      setResultArray(newList);
+    }    
+  }
+
+  const onSwipeEnd = (rowKey, rowMap) => {
+    const index = myList.findIndex(item => item.id === rowKey);
+    console.log(`Swiped item with id ${rowKey} at index ${index}`);
   };
+
+  const [myList, setMyList] = useState([]);
 
   const user = FIREBASE_AUTH.currentUser  
 
@@ -85,6 +115,7 @@ const FavoriteScreen = ({ navigation }) => {
       const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Favourite"));
       let productQuery = Object.freeze({ name: "Score", points: 157 });
       const listData = [];
+
       querySnapshot.forEach((doc) => {
         listData.push({
           imageUrl: doc.data().img,
@@ -93,10 +124,12 @@ const FavoriteScreen = ({ navigation }) => {
           id: doc.id,
           description: doc.data().description,
           color: doc.data().color,
-        })        
+          quantity: doc.data().quantity,
+        })   
       })
       productQuery = listData;
       setResultArray(productQuery);
+
     };
 
     fetchValue();
@@ -106,6 +139,8 @@ const FavoriteScreen = ({ navigation }) => {
     <SafeAreaView style={{
       paddingVertical: 24,
       gap: 15,
+      backgroundColor: 'white',
+      flex: 1,
     }}>
       <View style={{
         paddingHorizontal: 24,
@@ -125,20 +160,22 @@ const FavoriteScreen = ({ navigation }) => {
       </View>
 
       <View style={{
-        height: "81%"
+        height: "82%",        
       }}>
         <SwipeListView
           data={resultArray}
-          contentContainerStyle={{ paddingHorizontal: 16 }}
+          contentContainerStyle={{ paddingHorizontal: 16, backgroundColor: 'white', }}
+          onSwipeEnd = {onSwipeEnd}
           renderItem={(data, rowMap) => {
             return (
               <View
                 style={{
                   flex: 1,
-                  backgroundColor: colors.background,
+                  backgroundColor: 'white',
                   height: 150,
                   padding: 6,
-
+                  borderColor: '#DADADA',
+                  borderBottomWidth: 1,
                 }}>
                 <View
                   style={{
@@ -158,7 +195,7 @@ const FavoriteScreen = ({ navigation }) => {
                     <Text
                       style={{
                         fontSize: 15,
-                        fontWeight: "500",
+                        fontWeight: '500',
                         color: colors.text,
                         textShadowColor: "rgba(0,0,0,0.2)",
                         textShadowOffset: {
@@ -197,7 +234,7 @@ const FavoriteScreen = ({ navigation }) => {
                           borderRadius: 100,
                         }}>
                         <TouchableOpacity
-                          onPress={() => setCount((count) => Math.max(1, count - 1))}
+                          onPress={() => {handleMinusQuan(data.item.id, rowMap)}}
                           style={{
                             backgroundColor: colors.card,
                             width: 24,
@@ -213,9 +250,9 @@ const FavoriteScreen = ({ navigation }) => {
                             fontSize: 12,
                             fontWeight: "600",
                             color: colors.background
-                          }}>{count}</Text>
+                          }}>{data.item.quantity}</Text>
                         <TouchableOpacity
-                          onPress={() => setCount((count) => Math.min(10, count + 1))}
+                          onPress={() => {handlePlusQuan(data.item.id, rowMap)}}
                           style={{
                             backgroundColor: colors.card,
                             width: 24,
@@ -259,7 +296,7 @@ const FavoriteScreen = ({ navigation }) => {
                   borderRadius: 24,
                 }}>
                 <TouchableOpacity
-                  onPress={() => deleteRow(rowMap, data.item.key)}
+                  onPress={() => deleteRow(rowMap, data.item.id, data.item.id)}
                   style={{
                     alignSelf: "flex-end",
                     alignItems: "center",
@@ -292,7 +329,7 @@ const FavoriteScreen = ({ navigation }) => {
         }}>
 
         <TouchableOpacity
-          onPress={() => { navigation.navigate("Cart Screen") }}
+          onPress={() => { handleAddToCart() }}
           style={{
             backgroundColor: colors.primary,
             height: 64,

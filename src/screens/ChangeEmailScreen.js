@@ -11,7 +11,6 @@ import {
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Input from '../uc/Input'
 import { FIREBASE_AUTH } from '../../firebaseConfig';
 import { signInWithEmailAndPassword, updateEmail } from 'firebase/auth';
 

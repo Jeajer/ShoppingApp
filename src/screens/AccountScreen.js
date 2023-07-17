@@ -24,7 +24,6 @@ import {
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-
 const AccountScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
@@ -175,7 +174,7 @@ const AccountScreen = ({ navigation }) => {
           marginTop: 10,
           gap: 10
         }}>
-          <TouchableOpacity onPress={() => { navigation.navigate('Change Email Screen') }}>
+          <TouchableOpacity onPress={() => navigation.navigate("Change Email Screen")}>
             <View style={styles.viewContainer}>
               <View
                 style={{ width: '90%' }}

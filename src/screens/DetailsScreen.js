@@ -31,6 +31,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
             price: price,
             img: imageUrl,
             color: color,
+            quantity: 1,
           });
         } catch (error) {
           console.log(error.message)
