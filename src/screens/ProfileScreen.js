@@ -15,7 +15,7 @@ import { SignOutUser } from '../utilities/Utilities';
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
 import {
   collection,
-  getDocs,
+  getDoc,
   deleteDoc,
   doc,
   onSnapshot,
@@ -65,6 +65,8 @@ const ProfileScreen = ({ navigation }) => {
 
   const user = FIREBASE_AUTH.currentUser;
   const [displayName, setDisplayName] = useState('')
+  const [email, setEmail] = useState('')
+  const [img, setImg] = useState('')
 
   const RenderItem = ({ item, index }) => {
     return (
@@ -103,6 +105,8 @@ const ProfileScreen = ({ navigation }) => {
 
       if (docSnap.exists()) {
         setDisplayName(docSnap.data().displayName)
+        setEmail(docSnap.data().email)
+        setImg(docSnap.data().img)
       } else {
         // docSnap.data() will be undefined in this case
         console.log("No such document!");
@@ -147,7 +151,7 @@ const ProfileScreen = ({ navigation }) => {
             flexDirection: "row",
             gap: 15,
           }}>
-          <Image source={{ uri: customer.img ? customer.img : AVATAR_URL }}
+          <Image source={{ uri: img ? img : AVATAR_URL }}
             style={{ width: 70, aspectRatio: 1, borderRadius: 100 }}
             resizeMode="cover" />
           <View style={{ flex: 1 }}>
@@ -156,7 +160,7 @@ const ProfileScreen = ({ navigation }) => {
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>
-              {customer.email}
+              {email}
             </Text>
           </View>
           <Icon name="chevron-right" size={30} color={colors.text} />
