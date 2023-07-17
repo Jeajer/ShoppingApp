@@ -147,8 +147,6 @@ const ShoppingScreen = ({ navigation }) => {
     fetchDoc();
   }, []);
 
-  const handleCategory = async () => { }
-
   // Retrieve the documents in the collection
 
   const handle = async () => {

@@ -7,7 +7,17 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
-import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
+import { 
+  doc, 
+  setDoc, 
+  getDoc, 
+  collection, 
+  query,
+  where, 
+  getDocs, 
+  deleteDoc, 
+  updateDoc 
+} from 'firebase/firestore';
 
 
 
@@ -131,7 +141,8 @@ const FavoriteScreen = ({ navigation }) => {
     <SafeAreaView style={{
       paddingVertical: 24,
       gap: 15,
-      backgroundColor: 'white'
+      backgroundColor: 'white',
+      flex: 1,
     }}>
       <View style={{
         paddingHorizontal: 24,
@@ -186,7 +197,7 @@ const FavoriteScreen = ({ navigation }) => {
                     <Text
                       style={{
                         fontSize: 15,
-                        fontWeight: "500",
+                        fontWeight: '500',
                         color: colors.text,
                         textShadowColor: "rgba(0,0,0,0.2)",
                         textShadowOffset: {

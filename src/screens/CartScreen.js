@@ -136,6 +136,7 @@ const CartScreen = ({navigation}) => {
     <SafeAreaView style={{
       paddingVertical: 24,
       gap: 10,
+      flex: 1,
       }}>
       <View style={{
           paddingHorizontal: 24,

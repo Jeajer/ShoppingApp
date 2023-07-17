@@ -1,9 +1,21 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Button } from 'react-native';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import { View, FlatList, Text, StyleSheet, ScrollView, TouchableOpacity, Image, } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  updateDoc
+} from 'firebase/firestore';
+import { FIREBASE_DB } from '../../firebaseConfig';
 
 const ORDER_LIST = [
   {
@@ -20,322 +32,367 @@ const ORDER_LIST = [
     price: 50,
     quantity: "1",
   },
-  
+
 ];
 
-const DetailOrderScreen = ({navigation}) => {
-    const {colors} = useTheme();
+const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
+  const { colors } = useTheme();
 
-    const RenderItem = ({item, index}) => {
-        return (
-            <View 
-            style={{
-              flex: 1,
-              backgroundColor: colors.background, 
-              padding: 6,
-              
-            }}>
-            <View 
-              style={{
-              flexDirection: "row",  
-              gap: 8,
-              alignItems: "flex-end",
-              justifyContent: "space-between"
-            }}>
-              <Image
-                  source={{uri: item.img}}
-                  resizeMode="contain"
-                  height={100}
-                  width={100}
-                  style={{borderRadius: 24,}}/>
+  const [resultArray, setResultArray] = useState([]);
+  const [cancel, setCancel] = useState('')
 
-              <View style={{padding: 12, gap: 6}}>
-                <Text 
-                    style={{
-                      fontSize: 15, 
-                      fontWeight: "500",
-                      color: colors.text,
-                      textShadowColor: "rgba(0,0,0,0.2)",
-                      textShadowOffset: {
-                        height: 1,
-                        width: 0,
-                      },
-                      textShadowRadius: 4,
-                    }}>
-                        {item.name_pro}
-                </Text>
-
-                <View style={{flexDirection: "row", gap: 7, alignItems: "center"}}>                    
-                  <View 
-                      style={{
-                        backgroundColor: item.color, 
-                        width: 16, 
-                        height: 16,
-                        borderRadius: 8,
-                    }}/>
-                  <Text 
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "400",
-                  }}>{item.color}</Text>
-                </View>
-
-                <Text 
-                    style={{
-                      fontSize: 16, 
-                      fontWeight: "400",
-                      color: colors.text,
-                    }}>
-                        Quantity: {item.quantity}
-                </Text>
-              </View>
-
-              <View style={{justifyContent: "flex-end", alignItems: "flex-end"}}>
-                <Text 
-                style={{
-                  fontSize: 16, 
-                  fontWeight: "600", 
-                  color: colors.text,
-                  paddingHorizontal: 16,
-                  paddingVertical: 16,
-                }}
-                numberOfLines={1}>
-                ${(item.price).toLocaleString()}
-                </Text>
-              </View>             
-            </View>
-          </View>
-        )
+  useEffect(() => {
+    const fetchDoc = async () => {
+      const docRef = doc(FIREBASE_DB, "Orders", id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setResultArray(docSnap.data().product)
+        if (docSnap.data().status === 'Processing') {
+          setCancel('Cancel');
+        }
+      } else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+      }
     }
 
+    fetchDoc();
+  }, [])
 
+  const RenderItem = ({ item, index }) => {
     return (
-        <SafeAreaView style={{
-          paddingVertical: 24,
-          gap: 20
-          }}>
-            <View style={{
-                paddingHorizontal: 24,
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexDirection: "row"
-                }}>
-                <TouchableOpacity
-                    onPress={() => {navigation.goBack()}}>
-                    <Icon name='chevron-left' size={30} color="#000"/>
-                </TouchableOpacity>
-                <Text style={{
-                    fontSize: 24,
-                    fontWeight: "700",
-                    }}>Detail Order</Text>
-                <View style={{width: 30}}/>
-            </View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          padding: 6,
 
-            <Text style={{
-                fontSize: 20,
-                fontWeight: "700",
-                paddingHorizontal: 24,
-                }}>
-                    Order: No1212
+        }}>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 8,
+            alignItems: "flex-end",
+            justifyContent: "space-between"
+          }}>
+          <Image
+            source={{ uri: item.imageUrl }}
+            resizeMode="contain"
+            height={100}
+            width={100}
+            style={{ borderRadius: 24, }} />
+
+          <View style={{ padding: 12, gap: 6 }}>
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: "500",
+                color: colors.text,
+                textShadowColor: "rgba(0,0,0,0.2)",
+                textShadowOffset: {
+                  height: 1,
+                  width: 0,
+                },
+                textShadowRadius: 4,
+              }}>
+              {item.title}
             </Text>
 
-            <View style={{
-                justifyContent: "flex-start",
-                alignItems: "flex-start",
-                flexDirection: "row",
-                height: "40%"}}>
-                <FlatList 
-                    data={ORDER_LIST}
-                    contentContainerStyle={{
-                        paddingHorizontal: 24,
-                        gap: 18,
-                    }}
-                    renderItem={({item, index}) => {
-                    return (
-                        <View>
-                            <RenderItem item={item} index={index}/>
-                            <View style={{height: 1, backgroundColor: colors.border, marginTop: 18}}/>
-                        </View>
-                    )
-                }}/>
+            <View style={{ flexDirection: "row", gap: 7, alignItems: "center" }}>
+              <View
+                style={{
+                  backgroundColor: item.color,
+                  width: 16,
+                  height: 16,
+                  borderRadius: 8,
+                }} />
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "400",
+                }}>{item.color}</Text>
             </View>
 
-            <View
+            <Text
               style={{
-                paddingHorizontal: 40,
-                gap: 10,
-                marginTop: -15
+                fontSize: 16,
+                fontWeight: "400",
+                color: colors.text,
               }}>
-              <View 
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: "400",
-                  color: colors.text,
-                  opacity: 0.8
-                }}>
-                  Order:
-                </Text>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: colors.text,
-                }}>
-                  ${(80).toLocaleString()}
-                </Text>
-              </View>
+              Quantity: {item.quantity}
+            </Text>
+          </View>
 
-              <View 
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: "400",
-                  color: colors.text,
-                  opacity: 0.8
-                }}>
-                  Delivery:
-                </Text>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: colors.text,
-                }}>
-                  ${(10).toLocaleString()}
-                </Text>
-              </View>
+          <View style={{ justifyContent: "flex-end", alignItems: "flex-end" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                color: colors.text,
+                paddingHorizontal: 16,
+                paddingVertical: 16,
+              }}
+              numberOfLines={1}>
+              ${(item.price).toLocaleString()}
+            </Text>
+          </View>
+        </View>
+      </View>
+    )
+  }
 
-              <View 
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: "400",
-                  color: colors.text,
-                  opacity: 0.8
-                }}>
-                  Promotion:
-                </Text>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: colors.text,
-                }}>
-                  - ${(0).toLocaleString()}
-                </Text>
-              </View>
 
-              <View 
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginTop: 7,
-                  justifyContent: "space-between",
-                }}>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: colors.text,
-                  }}>
-                  Total Price:
-                </Text>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: "red",
-                }}>
-                  ${(90).toLocaleString()}
-                </Text>
-              </View>
+  return (
+    <SafeAreaView style={{
+      paddingVertical: 24,
+      gap: 20,
+      flex: 1,
+    }}>
+      <View style={{
+        paddingHorizontal: 24,
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row"
+      }}>
+        <TouchableOpacity
+          onPress={() => { navigation.goBack() }}
+          style={{
+            alignContent: 'flex-start',
+            width: 20,
+          }}
+        >
+          <Icon name='chevron-left' size={30} color="#000" />
+        </TouchableOpacity>
+        <Text style={{
+          fontSize: 24,
+          fontWeight: "700",
+          textAlign: 'center',
+          alignItems: 'center',
+          alignContent: 'center',
+          flex: 1,
+        }}>Detail Order</Text>
+        {/* <View style={{ width: 30 }} /> */}
+        {cancel && (
+          <TouchableOpacity onPress={() => navigation.navigate("Confirm Cancel Screen", {id: id})}>
+            <Text
+              style={{
+                fontSize: 15,
+                color: 'red'
+              }}
+            >
+              {cancel}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
-        
-            </View>
+      <Text style={{
+        fontSize: 20,
+        fontWeight: "700",
+        paddingHorizontal: 24,
+      }}>
+        Order: {id}
+      </Text>
 
-            <View style={{
-              paddingHorizontal: 40,
-              alignItems: "flex-start",}}>
-              <View style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 20,
-              }}>
-                <View style={{
-                  padding: 15, 
-                  borderRadius: 100,
-                  backgroundColor: "green",
-                  }}>
-                  <Icon name="truck" size={25} color="white" />
-                </View>
-                <Text 
-                  style={{
-                    fontSize: 16, 
-                    fontWeight: "700", 
-                    color: colors.text,
-                  }}>
-                  Send to your home
-                </Text>
+      <View style={{
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        flexDirection: "row",
+        height: "40%"
+      }}>
+        <FlatList
+          data={resultArray}
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            gap: 18,
+          }}
+          renderItem={({ item, index }) => {
+            return (
+              <View>
+                <RenderItem item={item} index={index} />
+                <View style={{ height: 1, backgroundColor: colors.border, marginTop: 18 }} />
               </View>
-              <View style={{height: 15, width:2, backgroundColor: "black", alignItems: "flex-start", marginLeft: 25}}/>
-              <View style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 20,
-              }}>
-                <View style={{
-                  padding: 15, 
-                  borderRadius: 100,
-                  backgroundColor: "gray",
-                  }}>
-                  <Icon name="archive-clock" size={25} color="white" />
-                </View>
-                <Text 
-                  style={{
-                    fontSize: 16, 
-                    fontWeight: "700", 
-                    color: colors.text,
-                  }}>
-                  Processed at  sort facility
-                </Text>
-              </View>
-              <View style={{height: 15, width:2, backgroundColor: "black", alignItems: "flex-start", marginLeft: 25}}/>
-              <View style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 20,
-              }}>
-                <View style={{
-                  padding: 15, 
-                  borderRadius: 100,
-                  backgroundColor: "gray",
-                  }}>
-                  <Icon name="archive" size={25} color="white" />
-                </View>
-                <Text 
-                  style={{
-                    fontSize: 16, 
-                    fontWeight: "700", 
-                    color: colors.text,
-                  }}>
-                  Departed Facility
-                </Text>
-              </View>
-            </View>
-            
-        </SafeAreaView>
-    );
+            )
+          }} />
+      </View>
+
+      <View
+        style={{
+          paddingHorizontal: 40,
+          gap: 10,
+          marginTop: -15
+        }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}>
+          <Text style={{
+            fontSize: 16,
+            fontWeight: "400",
+            color: colors.text,
+            opacity: 0.8
+          }}>
+            Order:
+          </Text>
+          <Text style={{
+            fontSize: 16,
+            fontWeight: "600",
+            color: colors.text,
+          }}>
+            ${(80).toLocaleString()}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}>
+          <Text style={{
+            fontSize: 16,
+            fontWeight: "400",
+            color: colors.text,
+            opacity: 0.8
+          }}>
+            Delivery:
+          </Text>
+          <Text style={{
+            fontSize: 16,
+            fontWeight: "600",
+            color: colors.text,
+          }}>
+            ${(10).toLocaleString()}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}>
+          <Text style={{
+            fontSize: 16,
+            fontWeight: "400",
+            color: colors.text,
+            opacity: 0.8
+          }}>
+            Promotion:
+          </Text>
+          <Text style={{
+            fontSize: 16,
+            fontWeight: "600",
+            color: colors.text,
+          }}>
+            - ${(0).toLocaleString()}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: 7,
+            justifyContent: "space-between",
+          }}>
+          <Text style={{
+            fontSize: 16,
+            fontWeight: "600",
+            color: colors.text,
+          }}>
+            Total Price:
+          </Text>
+          <Text style={{
+            fontSize: 16,
+            fontWeight: "600",
+            color: "red",
+          }}>
+            ${(90).toLocaleString()}
+          </Text>
+        </View>
+
+
+      </View>
+
+      <View style={{
+        paddingHorizontal: 40,
+        alignItems: "flex-start",
+      }}>
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 20,
+        }}>
+          <View style={{
+            padding: 15,
+            borderRadius: 100,
+            backgroundColor: "green",
+          }}>
+            <Icon name="truck" size={25} color="white" />
+          </View>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "700",
+              color: colors.text,
+            }}>
+            Send to your home
+          </Text>
+        </View>
+        <View style={{ height: 15, width: 2, backgroundColor: "black", alignItems: "flex-start", marginLeft: 25 }} />
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 20,
+        }}>
+          <View style={{
+            padding: 15,
+            borderRadius: 100,
+            backgroundColor: "gray",
+          }}>
+            <Icon name="archive-clock" size={25} color="white" />
+          </View>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "700",
+              color: colors.text,
+            }}>
+            Processed at  sort facility
+          </Text>
+        </View>
+        <View style={{ height: 15, width: 2, backgroundColor: "black", alignItems: "flex-start", marginLeft: 25 }} />
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 20,
+        }}>
+          <View style={{
+            padding: 15,
+            borderRadius: 100,
+            backgroundColor: "gray",
+          }}>
+            <Icon name="archive" size={25} color="white" />
+          </View>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "700",
+              color: colors.text,
+            }}>
+            Departed Facility
+          </Text>
+        </View>
+      </View>
+
+    </SafeAreaView>
+  );
 };
 
 export default DetailOrderScreen;
