@@ -10,26 +10,6 @@ import CustomBackdrop from "../components/CustomBackdrop";
 import PostView from "../components/PostView";
 import PostNavigator from "../navigators/PostNavigator";
 
-const SECONDHAND_LIST = [
-    {
-        name_acc: "Quang Mạnh",
-        avatar: "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg",
-        img_pro: "https://sneakerfits.com/wp-content/uploads/2018/07/nike-just-do-it-orange-jacket-sneaker-match-2.jpg",
-        pro: "Custom Nike Hoodies",
-        description: "Worn 2 times",
-        price: "$30.0",
-    },
-    {
-        name_acc: "Quang Mạnh",
-        avatar: "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg",
-        img_pro: "https://sneakerdaily.vn/wp-content/uploads/2022/12/ao-hoodie-nike-sportswear-essentials-french-terry-hoodie-mens-running-top-gray-dd4667-063-4.jpg",
-        pro: "Custom Nike Hoodies",
-        description: "Worn 2 times",
-        price: "$30.0",
-    },
-    
-  ];
-
 const SecondhandScreen = ({navigation}) => {
     const {colors} = useTheme();
 
@@ -97,6 +77,21 @@ const SecondhandScreen = ({navigation}) => {
     const openFilterModal = useCallback(() => {
       bottomSheetModalRef.current?.present();
     }, []);
+    
+
+  const [sheetVisible, setSheetVisible] = useState(false);
+
+  const openBottomSheet = () => {
+    setSheetVisible(true);
+  };
+
+  const closeBottomSheet = () => {
+    setSheetVisible(false);
+  };
+
+  const handleButtonPress = () => {
+    setSheetVisible(false);
+  };
 
   return (
     <SafeAreaProvider style={{
@@ -130,11 +125,12 @@ const SecondhandScreen = ({navigation}) => {
           snapPoints={['85%']} 
           index={0}
           ref={bottomSheetModalRef}
+          visible={sheetVisible}
           backdropComponent={(props) => <CustomBackdrop {...props} />}
           backgroundStyle={{
             borderRadius: 24,
           }}>
-            <PostView/>
+            <PostView onClose={() => handleButtonPress()}/>
         </BottomSheetModal>
     </SafeAreaProvider>    
   )};

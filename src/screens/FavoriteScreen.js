@@ -19,8 +19,6 @@ import {
   updateDoc 
 } from 'firebase/firestore';
 
-
-
 const FavoriteScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
@@ -117,7 +115,7 @@ const FavoriteScreen = ({ navigation }) => {
       const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Favourite"));
       let productQuery = Object.freeze({ name: "Score", points: 157 });
       const listData = [];
-      const pCount = {};
+
       querySnapshot.forEach((doc) => {
         listData.push({
           imageUrl: doc.data().img,

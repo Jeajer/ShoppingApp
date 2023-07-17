@@ -1,5 +1,5 @@
 import {
-  React, useState,
+  React, useState, useEffect
 } from 'react';
 import {
   View,
@@ -13,7 +13,14 @@ import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SignOutUser } from '../utilities/Utilities';
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 
 const AVATAR_URL = "https://static.nike.com/a/images/f_auto/dpr_1.3,cs_srgb/h_455,c_limit/12f2c38e-484a-44be-a868-2fae62fa7a49/nike-just-do-it.jpg";
 
@@ -57,7 +64,19 @@ const ProfileScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
   const user = FIREBASE_AUTH.currentUser;
-  const displayName = user.displayName;
+
+  const [customer, setCustomer] = useState([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(FIREBASE_DB, "Users", user.uid), (doc) => {
+      const orderData = doc.data();
+      setCustomer(orderData);
+    });  
+  
+    return () => {
+      unsub();
+    };
+  }, [FIREBASE_DB]);
 
   const RenderItem = ({ item, index }) => {
     return (
@@ -124,16 +143,16 @@ const ProfileScreen = ({ navigation }) => {
             flexDirection: "row",
             gap: 15,
           }}>
-          <Image source={{ uri: AVATAR_URL }}
+          <Image source={{ uri: customer.img ? customer.img : AVATAR_URL }}
             style={{ width: 70, aspectRatio: 1, borderRadius: 100 }}
             resizeMode="cover" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 6, color: colors.text }}>
-              Hi, {user.displayName ? user.displayName : "Anonymous User"} 👋
+              Hi, {customer.displayName ? customer.displayName : "Anonymous User"} 👋
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>
-              {user.email}
+              {customer.email}
             </Text>
           </View>
           <Icon name="chevron-right" size={30} color={colors.text} />
