@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,30 +12,106 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Input from '../uc/Input';
 import * as ImagePicker from 'expo-image-picker';
-import { FIREBASE_AUTH } from '../../firebaseConfig';
+import { FIREBASE_AUTH, FIREBASE_STORAGE, FIREBASE_DB } from '../../firebaseConfig';
 import { updateProfile } from 'firebase/auth';
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 
 const AccountScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
   const [selectedImage, setSelectedImage] = useState("https://lh3.googleusercontent.com/EbXw8rOdYxOGdXEFjgNP8lh-YAuUxwhOAe2jhrz3sgqvPeMac6a6tHvT35V6YMbyNvkZL4R_a2hcYBrtfUhLvhf-N2X3OB9cvH4uMw=w1064-v0");
 
+  const user = FIREBASE_AUTH.currentUser;
+  console.log(user.uid);
+
+  const [customer, setCustomer] = useState([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(FIREBASE_DB, "Users", user.uid), (doc) => {
+      const orderData = doc.data();
+      setCustomer(orderData);
+      console.log(customer);
+    });  
+  
+    return () => {
+      unsub();
+    };
+  }, [FIREBASE_DB]);
+
+  const uploadImageToFirestore = async (imageUri) => {
+    try {
+      // Convert the image URI to a Blob
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+  
+      // Generate a unique filename for the image
+      const imageName = new Date().getTime() + '.jpg';
+  
+      // Get a reference to the Firebase Storage bucket
+      const storage = getStorage();
+      const storageRef = ref(storage, imageName);
+  
+      // Upload the image to Firebase Storage
+      await uploadBytes(storageRef, blob);
+  
+      // Get the download URL for the uploaded image
+      const imageUrl = await getDownloadURL(storageRef);
+  
+      // Update the image URL in Firestore
+      const userRef = doc(FIREBASE_DB, 'Users', user.uid);
+      await updateDoc(userRef, { img: imageUrl });
+      updateImagesInFirestore("Orders", imageUrl);
+      updateImagesInFirestore("Secondhand", imageUrl);
+  
+      console.log('Image uploaded to Firebase Storage and URL saved in Firestore.');
+    } catch (error) {
+      console.log('Error uploading image:', error);
+    }
+  };
+
+  const updateImagesInFirestore = async (location, newValue) => {
+    try {
+      const snapShot = await getDocs(collection(FIREBASE_DB, location));
+      let list = [];
+      snapShot.docs.forEach((doc) => {
+        list.push({ id: doc.id, ...doc.data() });
+      });
+      list = list.filter(item => item.idacc === user.uid);
+      list.forEach((item) => {
+        const docRef = doc(FIREBASE_DB, location, item.id);
+        updateDoc(docRef, { img: newValue });
+      });
+      console.log("Updated images in Firestore.");
+    } catch (error) {
+      console.log("Error updating images in Firestore:", error);
+    }
+  };
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       quality: 1,
     });
-
+  
     if (!result.canceled) {
-      console.log(result);
-      setSelectedImage(result.uri);
+      const selectedAsset = result.assets[0];
+      const selectedImageUri = selectedAsset.uri;
+  
+      setSelectedImage(selectedImageUri);
+      uploadImageToFirestore(selectedImageUri);
     } else {
       alert('You did not select any image.');
     }
   };
-
-  const user = FIREBASE_AUTH.currentUser;
 
   return (
     <SafeAreaView style={{
@@ -82,7 +158,7 @@ const AccountScreen = ({ navigation }) => {
 
             }}
             source={{
-              uri: user.photoURL ? user.photoURL : selectedImage,
+              uri: customer.img ? customer.img : selectedImage,
             }}
           />
         </TouchableOpacity>
@@ -184,49 +260,7 @@ const AccountScreen = ({ navigation }) => {
 
       </ScrollView>
 
-      <View
-        style={{
-          paddingHorizontal: 30,
-          marginBottom: 40,
-        }}>
-
-        <TouchableOpacity
-          onPress={() => { navigation.navigate("Add Address Screen") }}
-          style={{
-            backgroundColor: colors.primary,
-            height: 64,
-            borderRadius: 64,
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexDirection: "row",
-            padding: 12,
-          }}
-        >
-          <View />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: colors.background,
-            }}
-          >
-            Save Information
-          </Text>
-
-          <View
-            style={{
-              backgroundColor: colors.card,
-              width: 40,
-              aspectRatio: 1,
-              borderRadius: 40,
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-            <Icon name={"arrow-right"} size={24} color={colors.text} />
-          </View>
-        </TouchableOpacity>
-
-      </View>
+      
 
     </SafeAreaView>
   );
@@ -254,4 +288,4 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: '300',
   },
-})
+});

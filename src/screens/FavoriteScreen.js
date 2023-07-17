@@ -9,8 +9,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 
-const listData = [];
-
 const FavoriteScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
@@ -86,6 +84,7 @@ const FavoriteScreen = ({ navigation }) => {
     const fetchValue = async () => {
       const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Favourite"));
       let productQuery = Object.freeze({ name: "Score", points: 157 });
+      const listData = [];
       querySnapshot.forEach((doc) => {
         listData.push({
           imageUrl: doc.data().img,

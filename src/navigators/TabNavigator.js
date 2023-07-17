@@ -30,7 +30,8 @@ const TabsNavigator = () => {
                     component={ShoppingScreen} 
                     options={{
                       tabBarIcon(props) {
-                        return <Icon size={24} color="black" name="shopping" />}
+                        return <Icon size={24} color="black" name="shopping" />},
+                        unmountOnBlur: true,
                     }}/>
         <Tab.Screen name="Favorite" 
                     component={FavouriteNavigator} 
@@ -43,7 +44,7 @@ const TabsNavigator = () => {
                     component={ProfileNavigator} 
                     options={{
                       tabBarIcon(props) {
-                        return <Icon size={24} color="black" name="account" />}
+                        return <Icon size={24} color="black" name="account" />},
                     }}/>
       </Tab.Navigator>
     );

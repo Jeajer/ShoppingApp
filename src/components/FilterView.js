@@ -83,7 +83,7 @@ const FilterView = () => {
           onEndPriceChange={setEndPrice}/>
 
         {/* Sport Category Filter */}
-        <View style={{paddingHorizontal: 24}}>
+        {/* <View style={{paddingHorizontal: 24}}>
           <Text 
             style={{
               fontSize: 16,
@@ -98,7 +98,7 @@ const FilterView = () => {
             })}
           
           </View>
-        </View>
+        </View> */}
 
         {/* Color Filter */}
         <View style={{paddingHorizontal: 24}}>
