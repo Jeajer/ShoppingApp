@@ -267,7 +267,7 @@ const ShoppingScreen = ({ navigation }) => {
                   imageUrl: newCollection1.subImg,
                   price: newCollection1.price,
                   name: newCollection1.name,
-                  descripton: newCollection1.description,
+                  description: newCollection1.description,
                   color: newCollection1.color,
                 });
               }}
@@ -284,7 +284,7 @@ const ShoppingScreen = ({ navigation }) => {
                     imageUrl: newCollection2.subImg,
                     price: newCollection2.price,
                     name: newCollection2.name,
-                    descripton: newCollection2.description,
+                    description: newCollection2.description,
                     color: newCollection2.color,
                   });
                 }}
@@ -299,7 +299,7 @@ const ShoppingScreen = ({ navigation }) => {
                     imageUrl: newCollection3.subImg,
                     price: newCollection3.price,
                     name: newCollection3.name,
-                    descripton: newCollection3.description,
+                    description: newCollection3.description,
                     color: newCollection3.color,
                   });
                 }}
@@ -365,7 +365,7 @@ const ShoppingScreen = ({ navigation }) => {
                       imageUrl: item.imageUrl,
                       price: item.price,
                       name: item.title,
-                      descripton: item.description,
+                      description: item.description,
                       color: item.color,
                     });
                   }}
