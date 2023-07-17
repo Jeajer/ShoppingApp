@@ -6,7 +6,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
-import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+  serverTimestamp,
+  addDoc,
+} from 'firebase/firestore';
 
 
 const CheckOutScreen = ({ navigation }) => {
@@ -25,22 +37,57 @@ const CheckOutScreen = ({ navigation }) => {
   }
 
   const handleCheckout = async () => {
+    const i = 0;
+
+    try {
+      await addDoc(collection(FIREBASE_DB, "Orders"), {
+        idacc: user.uid,
+        img: 'https://firebasestorage.googleapis.com/v0/b/shopping-app-691fd.appspot.com/o/2%20-%20xkzoVAj.png?alt=media&token=ba013fa0-91c2-4869-a1af-6bdbdada9f2b',
+        name: user.displayName,
+        product: resultArray,
+        status: 'Processing',
+        time: serverTimestamp(),
+        totalprice: calculateTotalPrice(),
+        totalquantity: calculateTotalQuan(),
+      });
+    } catch (error) {
+      console.log(error.message)
+    }
+
+    // const collectionRef = await getDocs(collection(FIREBASE_DB, "Orders"));
+    // const newestDoc = '';
+
+    // try {
+    //   collectionRef.orderBy('time', 'desc').limit(1).get()
+    //     .then((querySnapshot) => {
+    //       if (!querySnapshot.empty) {
+    //         // Get the newest document from the query results
+    //         newestDoc = querySnapshot.docs[0].id;
+    //         console.log('Newest document:', newestDoc.data());
+    //       } else {
+    //         console.log('No documents found');
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.error('Error getting documents:', error);
+    //     });
+    // } catch (error) {
+    //   console.log(error)
+    // }
+
     resultArray.forEach(async (item) => {
       try {
-        await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid, "On Delivery", item.id), {
-          id: item.id,
-          description: item.description,
-          name: item.title,
-          price: item.price,
-          img: item.imageUrl,
-          color: item.color,
-          quantity: item.quantity,
-        });
+        // await addDoc(doc(FIREBASE_DB, "Orders", newestDoc, 'Products'), {
+        //   id: item.id,
+        //   name: item.title,
+        //   price: item.price,
+        //   img: item.imageUrl,
+        //   color: item.color,
+        //   quantity: item.quantity,
+        // });
+        removeFromCart(item.id)
       } catch (error) {
         console.log(error.message)
-      } finally {
-        console.log('Successfully added')
-        removeFromCart(item.id)
       }
     })
     setResultArray([])
@@ -49,6 +96,10 @@ const CheckOutScreen = ({ navigation }) => {
 
   const calculateTotalPrice = () => {
     return resultArray.reduce((total, product) => total + product.price, 0);
+  };
+
+  const calculateTotalQuan = () => {
+    return resultArray.reduce((total, product) => total + product.quantity, 0);
   };
 
   const fetchValue = async () => {
@@ -71,7 +122,7 @@ const CheckOutScreen = ({ navigation }) => {
     })
 
     const userData = {};
-    if(docSnap.exists){
+    if (docSnap.exists) {
       userData.address = docSnap.data().address;
       userData.country = docSnap.data().country;
       userData.displayName = docSnap.data().displayName;
@@ -81,7 +132,7 @@ const CheckOutScreen = ({ navigation }) => {
     }
     else {
       console.log("No such document!");
-    }    
+    }
     setUserData(userData);
     productQuery = listData;
     setResultArray(productQuery);
@@ -93,8 +144,9 @@ const CheckOutScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={{
-      paddingVertical: 24,
-      gap: 40,
+      marginTop: 30,
+      gap: 20,
+      flex: 1,
     }}>
       <View style={{
         paddingHorizontal: 24,
@@ -113,263 +165,273 @@ const CheckOutScreen = ({ navigation }) => {
         <View style={{ width: 30 }} />
       </View>
 
-      <View style={{
-        paddingHorizontal: 24,
-        gap: 10,
-      }}>
-        <View
+      <ScrollView>
+        <SafeAreaView
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between"
+            paddingVertical: 10,
+            gap: 30,
+            flex: 1,
           }}>
-          <Text style={{
-            fontSize: 18,
-            fontWeight: "600",
-            opacity: 0.5,
-          }}>
-            Shipping Address
-          </Text>
 
-          <TouchableOpacity>
-            <Icon name={'pencil-circle-outline'} size={30} color={colors.text} />
-          </TouchableOpacity>
-        </View>
+          <View style={{
+            paddingHorizontal: 24,
+            gap: 10,
+          }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between"
+              }}>
+              <Text style={{
+                fontSize: 18,
+                fontWeight: "600",
+                opacity: 0.5,
+              }}>
+                Shipping Address
+              </Text>
 
-        <View
-          style={{
-            paddingHorizontal: 20,
-            gap: 7
-          }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "600"
-            }}>
-            {user.displayName}
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "400",
-              opacity: 0.5
-            }}>
-            {userData.address}, {userData.country}
-          </Text>
-        </View>
-      </View>
+              <TouchableOpacity>
+                <Icon name={'pencil-circle-outline'} size={30} color={colors.text} />
+              </TouchableOpacity>
+            </View>
 
-      <View style={{
-        paddingHorizontal: 24,
-        gap: 10,
-      }}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between"
-          }}>
-          <Text style={{
-            fontSize: 18,
-            fontWeight: "600",
-            opacity: 0.5,
-          }}>
-            Payment
-          </Text>
+            <View
+              style={{
+                paddingHorizontal: 20,
+                gap: 7
+              }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "600"
+                }}>
+                {user.displayName}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "400",
+                  opacity: 0.5
+                }}>
+                {userData.address}, {userData.country}
+              </Text>
+            </View>
+          </View>
 
-          <TouchableOpacity>
-            <Icon name={'pencil-circle-outline'} size={30} color={colors.text} />
-          </TouchableOpacity>
-        </View>
+          <View style={{
+            paddingHorizontal: 24,
+            gap: 10,
+          }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between"
+              }}>
+              <Text style={{
+                fontSize: 18,
+                fontWeight: "600",
+                opacity: 0.5,
+              }}>
+                Payment
+              </Text>
 
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 20,
-            gap: 15,
+              <TouchableOpacity>
+                <Icon name={'pencil-circle-outline'} size={30} color={colors.text} />
+              </TouchableOpacity>
+            </View>
 
-          }}>
-          <Image
-            source={{ uri: "https://imageio.forbes.com/blogs-images/steveolenski/files/2016/07/Mastercard_new_logo-1200x865.jpg?format=jpg&width=1200" }}
-            resizeMode="contain"
-            height={80}
-            width={80}
-            style={{ borderRadius: 24, }} />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "500",
-            }}>
-            **** **** **** 3947
-          </Text>
-        </View>
-      </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 20,
+                gap: 15,
 
-      <View style={{
-        paddingHorizontal: 24,
-        gap: 10,
-      }}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between"
-          }}>
-          <Text style={{
-            fontSize: 18,
-            fontWeight: "600",
-            opacity: 0.5,
-          }}>
-            Delivery Method
-          </Text>
+              }}>
+              <Image
+                source={{ uri: "https://imageio.forbes.com/blogs-images/steveolenski/files/2016/07/Mastercard_new_logo-1200x865.jpg?format=jpg&width=1200" }}
+                resizeMode="contain"
+                height={80}
+                width={80}
+                style={{ borderRadius: 24, }} />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "500",
+                }}>
+                **** **** **** 3947
+              </Text>
+            </View>
+          </View>
 
-          <TouchableOpacity>
-            <Icon name={'pencil-circle-outline'} size={30} color={colors.text} />
-          </TouchableOpacity>
-        </View>
+          <View style={{
+            paddingHorizontal: 24,
+            gap: 10,
+          }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between"
+              }}>
+              <Text style={{
+                fontSize: 18,
+                fontWeight: "600",
+                opacity: 0.5,
+              }}>
+                Delivery Method
+              </Text>
 
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 20,
-            gap: 15
-          }}>
-          <Image
-            source={{ uri: "https://i.ytimg.com/vi/Wu83TlJk2og/maxresdefault.jpg" }}
-            resizeMode="contain"
-            height={80}
-            width={80}
-            style={{ borderRadius: 24, }} />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "500",
-            }}>
-            Fast (2-3 days)
-          </Text>
-        </View>
-      </View>
+              <TouchableOpacity>
+                <Icon name={'pencil-circle-outline'} size={30} color={colors.text} />
+              </TouchableOpacity>
+            </View>
 
-      <View
-        style={{
-          paddingHorizontal: 40,
-          gap: 10,
-          marginTop: 10
-        }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 16,
-            fontWeight: "400",
-            color: colors.text,
-            opacity: 0.8
-          }}>
-            Order:
-          </Text>
-          <Text style={{
-            fontSize: 16,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            ${calculateTotalPrice().toLocaleString()}
-          </Text>
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 16,
-            fontWeight: "400",
-            color: colors.text,
-            opacity: 0.8
-          }}>
-            Delivery:
-          </Text>
-          <Text style={{
-            fontSize: 16,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            ${(10).toLocaleString()}
-          </Text>
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginTop: 7,
-            justifyContent: "space-between",
-          }}>
-          <Text style={{
-            fontSize: 16,
-            fontWeight: "600",
-            color: colors.text,
-          }}>
-            Total Price:
-          </Text>
-          <Text style={{
-            fontSize: 16,
-            fontWeight: "600",
-            color: "red",
-          }}>
-            ${(calculateTotalPrice() + 10).toLocaleString()}
-          </Text>
-        </View>
-
-
-      </View>
-
-      <View
-        style={{
-          paddingHorizontal: 30,
-          marginTop: 5,
-        }}>
-
-        <TouchableOpacity
-          onPress={() => { handleCheckout() }}
-          style={{
-            backgroundColor: colors.primary,
-            height: 64,
-            borderRadius: 64,
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexDirection: "row",
-            padding: 12,
-          }}
-        >
-          <View />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: colors.background,
-            }}
-          >
-            SUBMIT ORDER
-          </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 20,
+                gap: 15
+              }}>
+              <Image
+                source={{ uri: "https://i.ytimg.com/vi/Wu83TlJk2og/maxresdefault.jpg" }}
+                resizeMode="contain"
+                height={80}
+                width={80}
+                style={{ borderRadius: 24, }} />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "500",
+                }}>
+                Fast (2-3 days)
+              </Text>
+            </View>
+          </View>
 
           <View
             style={{
-              backgroundColor: colors.card,
-              width: 40,
-              aspectRatio: 1,
-              borderRadius: 40,
-              alignItems: "center",
-              justifyContent: "center",
+              paddingHorizontal: 40,
+              gap: 10,
+              marginTop: 10
             }}>
-            <Icon name={"arrow-right"} size={24} color={colors.text} />
-          </View>
-        </TouchableOpacity>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}>
+              <Text style={{
+                fontSize: 16,
+                fontWeight: "400",
+                color: colors.text,
+                opacity: 0.8
+              }}>
+                Order:
+              </Text>
+              <Text style={{
+                fontSize: 16,
+                fontWeight: "600",
+                color: colors.text,
+              }}>
+                ${calculateTotalPrice().toLocaleString()}
+              </Text>
+            </View>
 
-      </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}>
+              <Text style={{
+                fontSize: 16,
+                fontWeight: "400",
+                color: colors.text,
+                opacity: 0.8
+              }}>
+                Delivery:
+              </Text>
+              <Text style={{
+                fontSize: 16,
+                fontWeight: "600",
+                color: colors.text,
+              }}>
+                ${(10).toLocaleString()}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 7,
+                justifyContent: "space-between",
+              }}>
+              <Text style={{
+                fontSize: 16,
+                fontWeight: "600",
+                color: colors.text,
+              }}>
+                Total Price:
+              </Text>
+              <Text style={{
+                fontSize: 16,
+                fontWeight: "600",
+                color: "red",
+              }}>
+                ${(calculateTotalPrice() + 10).toLocaleString()}
+              </Text>
+            </View>
+
+
+          </View>
+
+          <View
+            style={{
+              paddingHorizontal: 30,
+              marginTop: 5,
+            }}>
+
+            <TouchableOpacity
+              onPress={() => { handleCheckout() }}
+              style={{
+                backgroundColor: colors.primary,
+                height: 64,
+                borderRadius: 64,
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexDirection: "row",
+                padding: 12,
+              }}
+            >
+              <View />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "600",
+                  color: colors.background,
+                }}
+              >
+                SUBMIT ORDER
+              </Text>
+
+              <View
+                style={{
+                  backgroundColor: colors.card,
+                  width: 40,
+                  aspectRatio: 1,
+                  borderRadius: 40,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+                <Icon name={"arrow-right"} size={24} color={colors.text} />
+              </View>
+            </TouchableOpacity>
+
+          </View>
+        </SafeAreaView>
+      </ScrollView>
 
     </SafeAreaView>
   );

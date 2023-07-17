@@ -13,7 +13,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Input from '../uc/Input';
 import * as ImagePicker from 'expo-image-picker';
 import { FIREBASE_AUTH } from '../../firebaseConfig';
-import { updateProfile } from 'firebase/auth';
 
 const AccountScreen = ({ navigation }) => {
   const { colors } = useTheme();
@@ -99,7 +98,7 @@ const AccountScreen = ({ navigation }) => {
           marginTop: 10,
           gap: 10
         }}>
-          <TouchableOpacity onPress={() => { navigation.navigate('Change Email Screen') }}>
+          <TouchableOpacity onPress={() => navigation.navigate("Change Email Screen")}>
             <View style={styles.viewContainer}>
               <View
                 style={{ width: '90%' }}
