@@ -1,5 +1,5 @@
 import {
-  React, useState,
+  React, useState, useEffect,
 } from 'react';
 import {
   View,
@@ -57,7 +57,7 @@ const ProfileScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
   const user = FIREBASE_AUTH.currentUser;
-  const displayName = user.displayName;
+  const [displayName, setDisplayName] = useState('')
 
   const RenderItem = ({ item, index }) => {
     return (
@@ -88,6 +88,22 @@ const ProfileScreen = ({ navigation }) => {
       console.log(error);
     }
   }
+
+  useEffect(() => {
+    const fetchDoc = async () => {
+      const docRef = doc(FIREBASE_DB, "Users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setDisplayName(docSnap.data().displayName)
+      } else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }
+
+    fetchDoc()
+  }, [])
 
   return (
     <SafeAreaView style={{
@@ -129,7 +145,7 @@ const ProfileScreen = ({ navigation }) => {
             resizeMode="cover" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 6, color: colors.text }}>
-              Hi, {user.displayName ? user.displayName : "Anonymous User"} 👋
+              Hi, {displayName ? displayName : "Anonymous User"} 👋
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>
