@@ -30,24 +30,28 @@ const AddressScreen = ({ navigation }) => {
   const user = FIREBASE_AUTH.currentUser;
   const [listData, setListData] = useState([]);
 
-  useEffect(async () => {
-    const docRef = doc(FIREBASE_DB, "Users", user.uid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const newItem = {
-        fullname: user.displayName,
-        address: docSnap.data().detail,
-        country: docSnap.data().country,
-        city: docSnap.data().city,
-        district: docSnap.data().district,
-      };
-      setListData([...listData, newItem]);
-      console.log("Document data:", docSnap.data());
-    } else {
-      // docSnap.data() will be undefined in this case
-      console.log("No such document!");
+  useEffect(() => {
+    const fetchData = async() => {      
+      const docRef = doc(FIREBASE_DB, "Users", user.uid);
+      const docSnap = await getDoc(docRef);
+  
+      if (docSnap.exists()) {
+        const newItem = {
+          fullname: user.displayName,
+          address: docSnap.data().detail,
+          country: docSnap.data().country,
+          city: docSnap.data().city,
+          district: docSnap.data().district,
+          
+        };
+        setListData([...listData, newItem]);
+      } else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+      }
     }
+
+    fetchData();
   }, []);
 
   const RenderItem = ({ item, index }) => {

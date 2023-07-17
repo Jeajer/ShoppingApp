@@ -64,19 +64,7 @@ const ProfileScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
   const user = FIREBASE_AUTH.currentUser;
-
-  const [customer, setCustomer] = useState([]);
-
-  useEffect(() => {
-    const unsub = onSnapshot(doc(FIREBASE_DB, "Users", user.uid), (doc) => {
-      const orderData = doc.data();
-      setCustomer(orderData);
-    });  
-  
-    return () => {
-      unsub();
-    };
-  }, [FIREBASE_DB]);
+  const [displayName, setDisplayName] = useState('')
 
   const RenderItem = ({ item, index }) => {
     return (
@@ -107,6 +95,22 @@ const ProfileScreen = ({ navigation }) => {
       console.log(error);
     }
   }
+
+  useEffect(() => {
+    const fetchDoc = async () => {
+      const docRef = doc(FIREBASE_DB, "Users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setDisplayName(docSnap.data().displayName)
+      } else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }
+
+    fetchDoc()
+  }, [])
 
   return (
     <SafeAreaView style={{
@@ -148,7 +152,7 @@ const ProfileScreen = ({ navigation }) => {
             resizeMode="cover" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 6, color: colors.text }}>
-              Hi, {customer.displayName ? customer.displayName : "Anonymous User"} 👋
+              Hi, {displayName ? displayName : "Anonymous User"} 👋
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>
