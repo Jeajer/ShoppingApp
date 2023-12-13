@@ -15,7 +15,7 @@ import { SignOutUser } from '../utilities/Utilities';
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
 import {
   collection,
-  getDocs,
+  getDoc,
   deleteDoc,
   doc,
   onSnapshot,
@@ -64,19 +64,9 @@ const ProfileScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
   const user = FIREBASE_AUTH.currentUser;
-
-  const [customer, setCustomer] = useState([]);
-
-  useEffect(() => {
-    const unsub = onSnapshot(doc(FIREBASE_DB, "Users", user.uid), (doc) => {
-      const orderData = doc.data();
-      setCustomer(orderData);
-    });  
-  
-    return () => {
-      unsub();
-    };
-  }, [FIREBASE_DB]);
+  const [displayName, setDisplayName] = useState('')
+  const [email, setEmail] = useState('')
+  const [img, setImg] = useState('')
 
   const RenderItem = ({ item, index }) => {
     return (
@@ -107,6 +97,24 @@ const ProfileScreen = ({ navigation }) => {
       console.log(error);
     }
   }
+
+  useEffect(() => {
+    const fetchDoc = async () => {
+      const docRef = doc(FIREBASE_DB, "Users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setDisplayName(docSnap.data().displayName)
+        setEmail(docSnap.data().email)
+        setImg(docSnap.data().img)
+      } else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }
+
+    fetchDoc()
+  }, [])
 
   return (
     <SafeAreaView style={{
@@ -143,16 +151,16 @@ const ProfileScreen = ({ navigation }) => {
             flexDirection: "row",
             gap: 15,
           }}>
-          <Image source={{ uri: customer.img ? customer.img : AVATAR_URL }}
+          <Image source={{ uri: img ? img : AVATAR_URL }}
             style={{ width: 70, aspectRatio: 1, borderRadius: 100 }}
             resizeMode="cover" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 6, color: colors.text }}>
-              Hi, {customer.displayName ? customer.displayName : "Anonymous User"} 👋
+              Hi, {displayName ? displayName : "Anonymous User"} 👋
             </Text>
             <Text style={{ color: colors.text, opacity: 0.75 }}
               numberOfLines={1}>
-              {customer.email}
+              {email}
             </Text>
           </View>
           <Icon name="chevron-right" size={30} color={colors.text} />

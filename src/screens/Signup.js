@@ -13,9 +13,9 @@ import {
 import React, { useState } from 'react'
 import { FIREBASE_AUTH, FIREBASE_PROVIDER, FIREBASE_DB } from '../../firebaseConfig';
 import { updateProfile, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import {firebase} from '../../firebaseConfig';
+import { firebase } from '../../firebaseConfig';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {doc, setDoc} from 'firebase/firestore'
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
 
 const img = "https://images.squarespace-cdn.com/content/v1/5e62cbf3daf9e45668fae6f0/1586199684548-T1XPYLITQ9EXU7RNV75J/BannerAnimation3.gif?format=2500w"
 const fbImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png"
@@ -26,8 +26,10 @@ const Signup = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [cpassword, setCPassword] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastname, setLastName] = useState('');
+    const [fullname, setFullname] = useState('');
+    const [phone, setPhone] = useState('');
+    const [address, setAddress] = useState('');
+    const [country, setCountry] = useState('');
     const [show, setShow] = React.useState(false);
     const [visible, setVisible] = React.useState(true);
     const [cshow, setCShow] = React.useState(false);
@@ -38,14 +40,17 @@ const Signup = ({ navigation }) => {
     const user = FIREBASE_AUTH.currentUser
 
     const [isFocused, setIsFocused] = React.useState(false);
-    const [isFNameFocused, setIsFNameFocused] = React.useState(false);
+    const [isFullnameFocused, setIsFullnameFocused] = React.useState(false);
     const [isLNameFocused, setIsLNameFocused] = React.useState(false);
     const [isPassFocused, setIsPassFocused] = React.useState(false);
     const [isCPassFocused, setIsCPassFocused] = React.useState(false);
+    const [isAddressFocused, setIsAddressFocused] = React.useState(false);
+    const [isCountryFocused, setIsCountryFocused] = React.useState(false);
+    const [isPhoneFocused, setIsPhoneFocused] = React.useState(false);
     const [errors, setErros] = useState({})
     const [showErrors, setShowErros] = useState(false)
 
-    const getErrors = (email, password, cpassword, firstName, lastname) => {
+    const getErrors = (email, password, cpassword, fullname, phone, address, country) => {
         const errors = {};
         if (!email) {
             errors.email = 'Please enter email!';
@@ -53,12 +58,20 @@ const Signup = ({ navigation }) => {
             errors.email = 'Please valid email';
         }
 
-        if (!firstName) {
-            errors.firstName = 'Please enter first name!';
+        if (!fullname) {
+            errors.fullname = 'Please enter full name!';
         }
 
-        if (!lastname) {
-            errors.lastname = 'Please enter last name!';
+        if (!phone) {
+            errors.phone = 'Please enter phone number!';
+        }
+
+        if (!address) {
+            errors.address = 'Please enter address!';
+        }
+
+        if (!country) {
+            errors.country = 'Please enter country!';
         }
 
         if (!password) {
@@ -80,9 +93,9 @@ const Signup = ({ navigation }) => {
 
     const firebasestore = FIREBASE_DB;
 
-    registerUser = async (email, password, cpassword, firstName, lastname) => {
-        // setLoading(true);
-        const errors = getErrors(email, password, cpassword, firstName, lastname);
+    registerUser = async (email, password, cpassword, fullname, phone, address, country) => {
+        setLoading(true);
+        const errors = getErrors(email, password, cpassword, fullname, phone, address, country);
         if (Object.keys(errors).length > 0) {
             setShowErros(true);
             setErros(errors)
@@ -94,64 +107,38 @@ const Signup = ({ navigation }) => {
         }
     }
 
-    const data = {
-        firstName: firstName,
-        lastName: lastname,
-        address: '',
-        email: email,
-        id: '',        
-    };
-
-    const todoRef = firebase.firestore().collection('Users');
-    const [addData, setAddData] = useState('');
-
-    const addField = async() => {
-        if(firstName && firstName.length>0){            
-            const data = {
-                firstName: firstName,
-                lastName: lastname,
-                address: '',
-                email: email,
-                id: FIREBASE_AUTH.currentUser.uid,
-            };
-            todoRef
-                .add(data)
-                .then(() => {
-                    setAddData('');
-                })
-                .catch((error) => {
-                    console.log(error.message)
-                })
-        }
-    }
-
     const handleSignIn = async (email, password) => {
         setLoading(true)
         createUserWithEmailAndPassword(auth, email, password)
             .then(async () => {
-                updateProfile(FIREBASE_AUTH.currentUser, {
-                    displayName: firstName + lastname,
-                    photoURL: 'https://in.pinterest.com/pin/324470348158135032/',
-                }).then(() => {
-                    console.log(user.displayName)
-                }).catch((error) => {
-                    console.log(error.message)
-                });
-                
-                try {
+                // updateProfile(FIREBASE_AUTH.currentUser, {
+                //     displayName: fullname,
+                //     photoURL: 'https://in.pinterest.com/pin/324470348158135032/',
+                // }).then(() => {
+                //     console.log(user.displayName)
+                // }).catch((error) => {
+                //     console.log(error.message)
+                // });
+
+                try{
                     await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid), {
-                        firstName: firstName,
-                        lastName: lastname,
-                        email: email,
+                        displayName: fullname,
+                        country: country,
+                        address: address,
                         id: FIREBASE_AUTH.currentUser.uid,
-                        detail: '',
-                        district: '',
-                        city: '',
-                        country: '',
-                    });
+                        img: 'https://in.pinterest.com/pin/324470348158135032/',
+                        username: user.email,
+                        phone: phone,
+                        timeStamp: serverTimestamp(),
+                    }
+                    ).then(() => {
+                        console.log('Success')
+                    }).catch((error) => {
+                        console.log(error.message)
+                    })
                 } catch (error) {
                     console.log(error.message)
-                } 
+                }
             }).catch((error) => {
                 if (error.code === 'auth/email-already-in-use') {
                     alert('User is already existed');
@@ -205,65 +192,32 @@ const Signup = ({ navigation }) => {
                             Become a member!
                         </Text>
 
-                        {/* first name box */}
                         <View style={{ marginVertical: 10 }}>
                             <Text style={styles.headerBox}>
-                                Firt name
+                                Full name
                             </Text>
 
-                            <View style={[styles.passwordContainer, { borderColor: isFNameFocused ? "#1E1D2E" : "#EAEDFB" }]}>
-                                <TextInput placeholder="Enter your first name"
-                                    placeholderTextColor='gray'
-                                    style={styles.input}
-                                    autoCapitalize='none'
-                                    onFocus={
-                                        () => {
-                                            // onFocus();
-                                            setIsFNameFocused(true);
-                                        }}
-                                    onBlur={() => { setIsFNameFocused(false) }}
-                                    keyboardType="default"
-                                    onChangeText={(text) => setFirstName(text)}
-                                    value={firstName}
-                                >
-                                </TextInput>
-                                <Icon name='account-outline' size={20} color={isFNameFocused ? "#1E1D2E" : "#B1B3CD"} />
-                            </View>
-
-                            {errors.firstName && (
-                                <Text style={styles.errorText}>
-                                    *{errors.firstName}
-                                </Text>
-                            )}
-
-                        </View>
-
-                        <View style={{ marginVertical: 10 }}>
-                            <Text style={styles.headerBox}>
-                                Last name
-                            </Text>
-
-                            <View style={[styles.passwordContainer, { borderColor: isLNameFocused ? "#1E1D2E" : "#EAEDFB" }]}>
-                                <TextInput placeholder="Enter your last name"
+                            <View style={[styles.passwordContainer, { borderColor: isFullnameFocused ? "#1E1D2E" : "#EAEDFB" }]}>
+                                <TextInput placeholder="Enter your full name"
                                     placeholderTextColor='gray'
                                     style={styles.input}
                                     autoCapitalize='words'
                                     onFocus={
                                         () => {
                                             // onFocus();
-                                            setIsLNameFocused(true);
+                                            setIsFullnameFocused(true);
                                         }}
-                                    onBlur={() => { setIsLNameFocused(false) }}
+                                    onBlur={() => { setIsFullnameFocused(false) }}
                                     keyboardType="default"
-                                    onChangeText={(text) => setLastName(text)}
-                                    value={lastname}
+                                    onChangeText={(text) => setFullname(text)}
+                                    value={fullname}
                                 >
                                 </TextInput>
-                                <Icon name='account-outline' size={20} color={isFocused ? "#1E1D2E" : "#B1B3CD"} />
+                                <Icon name='account-outline' size={20} color={isFullnameFocused ? "#1E1D2E" : "#B1B3CD"} />
                             </View>
-                            {errors.lastname && (
+                            {errors.fullname && (
                                 <Text style={styles.errorText}>
-                                    *{errors.lastname}
+                                    *{errors.fullname}
                                 </Text>
                             )}
                         </View>
@@ -294,6 +248,96 @@ const Signup = ({ navigation }) => {
                             {errors.email && (
                                 <Text style={styles.errorText}>
                                     *{errors.email}
+                                </Text>
+                            )}
+                        </View>
+
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.headerBox}>
+                                Address
+                            </Text>
+
+                            <View style={[styles.passwordContainer, { borderColor: isAddressFocused ? "#1E1D2E" : "#EAEDFB" }]}>
+                                <TextInput placeholder="Enter your address"
+                                    placeholderTextColor='gray'
+                                    style={styles.input}
+                                    autoCapitalize='none'
+                                    onFocus={
+                                        () => {
+                                            // onFocus();
+                                            setIsAddressFocused(true);
+                                        }}
+                                    onBlur={() => { setIsAddressFocused(false) }}
+                                    keyboardType="default"
+                                    onChangeText={(text) => setAddress(text)}
+                                    value={address}
+                                >
+                                </TextInput>
+                                <Icon name='email' size={20} color={isAddressFocused ? "#1E1D2E" : "#B1B3CD"} />
+                            </View>
+                            {errors.address && (
+                                <Text style={styles.errorText}>
+                                    *{errors.address}
+                                </Text>
+                            )}
+                        </View>
+
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.headerBox}>
+                                Country
+                            </Text>
+
+                            <View style={[styles.passwordContainer, { borderColor: isCountryFocused ? "#1E1D2E" : "#EAEDFB" }]}>
+                                <TextInput placeholder="Enter your country"
+                                    placeholderTextColor='gray'
+                                    style={styles.input}
+                                    autoCapitalize='none'
+                                    onFocus={
+                                        () => {
+                                            // onFocus();
+                                            setIsCountryFocused(true);
+                                        }}
+                                    onBlur={() => { setIsCountryFocused(false) }}
+                                    keyboardType="default"
+                                    onChangeText={(text) => setCountry(text)}
+                                    value={country}
+                                >
+                                </TextInput>
+                                <Icon name='email' size={20} color={isCountryFocused ? "#1E1D2E" : "#B1B3CD"} />
+                            </View>
+                            {errors.country && (
+                                <Text style={styles.errorText}>
+                                    *{errors.country}
+                                </Text>
+                            )}
+                        </View>
+
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.headerBox}>
+                                Phone
+                            </Text>
+
+                            <View style={[styles.passwordContainer, { borderColor: isPhoneFocused ? "#1E1D2E" : "#EAEDFB" }]}>
+                                <TextInput placeholder="Enter your phone number"
+                                    placeholderTextColor='gray'
+                                    style={styles.input}
+                                    autoCapitalize='none'
+                                    onFocus={
+                                        () => {
+                                            // onFocus();
+                                            setIsPhoneFocused(true);
+                                        }}
+                                    onBlur={() => { setIsPhoneFocused(false) }}
+                                    keyboardType="default"
+                                    onChangeText={(text) => setPhone(text)}
+                                    value={phone}
+                                >
+                                </TextInput>
+                                <Icon name='email' size={20} color={isPhoneFocused ? "#1E1D2E" : "#B1B3CD"} />
+                            </View>
+                            {errors.phone && (
+                                <Text style={styles.errorText}>
+                                    *{errors.phone}
                                 </Text>
                             )}
                         </View>
@@ -426,7 +470,7 @@ const Signup = ({ navigation }) => {
                         : (
                             <>
                                 <TouchableOpacity
-                                    onPress={() => registerUser(email, password, cpassword, firstName, lastname)}
+                                    onPress={() => { registerUser(email, password, cpassword, fullname, phone, address, country) }}
                                     style={{
                                         backgroundColor: '#1E1D2E',
                                         marginTop: 50,

@@ -195,7 +195,7 @@ const FavoriteScreen = ({ navigation }) => {
                     <Text
                       style={{
                         fontSize: 15,
-                        fontWeight: '500',
+                        fontWeight: 200,
                         color: colors.text,
                         textShadowColor: "rgba(0,0,0,0.2)",
                         textShadowOffset: {

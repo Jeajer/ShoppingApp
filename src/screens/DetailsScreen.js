@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
 
-const DetailsScreen = ({ navigation, route: { params: { id, name, price, descripton, imageUrl, color } } }) => {
+const DetailsScreen = ({ navigation, route: { params: { id, name, price, description, imageUrl, color } } }) => {
   const bottomSheetRef = useRef(null);
   const insets = useSafeAreaInsets();
 
@@ -26,7 +26,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
         try {
           await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid, "Favourite", id), {
             id: id,
-            description: descripton,
+            description: description,
             name: name,
             price: price,
             img: imageUrl,
@@ -56,28 +56,26 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
   const [size, setSize] = useState(SIZES[0]);
   const [imag, setImag] = useState('')
 
-  const addItemToArray = async (item, key) => {
+  
+
+  const handleAddToCart = async (id) => {
     try {
-      // Retrieve the array from AsyncStorage
-      const existingArray = await AsyncStorage.getItem(key);
-      let updatedArray = [];
-
-      if (existingArray !== null) {
-        // If the array exists, parse it from JSON and update it
-        updatedArray = JSON.parse(existingArray);
-      }
-
-      // Add the new item to the array
-      updatedArray.push(item);
-
-      // Save the updated array back to AsyncStorage
-      await AsyncStorage.setItem(key, JSON.stringify(updatedArray));
-
-      console.log('Item added to the array successfully!');
+      await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid, "Carts", id), {
+        id: id,
+        description: description,
+        name: name,
+        price: price,
+        img: imageUrl,
+        color: color,
+        quantity: count,
+      });
     } catch (error) {
-      console.log('Error adding item to the array:', error);
+      console.log(error.message)
+    } finally {
+      console.log('Successfully added')
     }
-  };
+    alert('Successfully added')
+  }
 
   useEffect(() => {
     const fetchDoc = async () => {
@@ -313,7 +311,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
                   opacity: 0.75,
                 }}
                 numberOfLines={6}>
-                {descripton}
+                {description}
               </Text>
             </View>
           </View>
@@ -340,7 +338,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
             </View>
 
             <TouchableOpacity
-              onPress={() => addItemToArray(id, "carts")}
+              onPress={() => handleAddToCart(id)}
               style={{
                 backgroundColor: colors.primary,
                 height: 64,
