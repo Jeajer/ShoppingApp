@@ -1,3 +1,8 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "java.project.sourcePaths": [
+        "recommendation-system/backend/recommend_system_package/function_package"
+    ]
 }
