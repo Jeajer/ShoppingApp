@@ -1,13 +1,19 @@
 import { React, useRef, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StatusBar, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
+import { BlurView } from 'expo-blur';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ScrollView } from 'react-native-gesture-handler';
+import MasonryList from '@react-native-seoul/masonry-list';
+import axios from 'axios'
+import publicIP from 'react-native-public-ip';
+
 
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
 
@@ -48,6 +54,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
       }
     } else {
       alert('You have to login first')
+
     }
   };
 
@@ -55,8 +62,11 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
   const [count, setCount] = useState(1);
   const [size, setSize] = useState(SIZES[0]);
   const [imag, setImag] = useState('')
+  const [forYou, setForYou] = useState([])
+  const [favouriteString, setFavouriteString] = useState('');
+  const [rcmProducts, setRCMProducts] = useState([]);
 
-  
+  const RCM_LIST = []
 
   const handleAddToCart = async (id) => {
     try {
@@ -76,33 +86,264 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
     }
     alert('Successfully added')
   }
+  
+  //reload the screen
+  const [reload, setReload] = useState(false);
 
+  const reloadScreen = () => {
+    setReload(true);
+  };
+
+  //useEffect
   useEffect(() => {
+    if (reload) {
+      // Thực hiện các hành động cần thiết khi reload
+      setReload(false);
+    }
+
     const fetchDoc = async () => {
       if (user) {
         const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Favourite"));
         if (querySnapshot) {
           querySnapshot.forEach((doc) => {
+            favouriteStr = favouriteStr + doc.data().id + ' ';
             if (doc.id === id) {
               setIsButtonOn(true);
             }
           });
         }
+        setFavouriteString(favouriteStr)
       }
     }
+
+    const fetchData = async () => {
+      try {
+        axios.get("http://10.0.23.91:8000/api/content")
+          .then(res => {
+            //console.log(res)
+            setRCMProducts(res.data)
+            let foundObject = [];
+            console.log(id)
+            let check = false;
+            for (let i = 0; i < res.data.length; i++) {
+              if (res.data[i].name === id) {
+                check = true;
+              }
+            }
+            if (!check) {
+              axios.post('http://10.0.23.91:8000/api/content/', {
+                "name": id,
+                "recommendation": ""
+              })
+                .then(function (response) {
+                  console.log("day la: ", response.data.name);
+                  let listt = response.data.recommendation
+                  for (let i = 0; i < listt.length; i++) {
+                    RCM_LIST.push({
+                      imageUrl: listt[i].imageUrl,
+                      title: listt[i].title,
+                      price: listt[i].price,
+                      id: listt[i].id,
+                      description: listt[i].description,
+                      color: listt[i].color,
+                    });
+                  }
+                  console.log(RCM_LIST)
+                  setForYou(RCM_LIST)
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+            }
+            else {
+              for (let i = 0; i < res.data.length; i++) {
+                if (res.data[i].name === id) {
+                  foundObject = res.data[i].recommendation;
+                  break;
+                }
+              }
+
+              for (let i = 0; i < foundObject.length; i++) {
+                RCM_LIST.push({
+                  imageUrl: foundObject[i].imageUrl,
+                  title: foundObject[i].title,
+                  price: foundObject[i].price,
+                  id: foundObject[i].id,
+                  description: foundObject[i].description,
+                  color: foundObject[i].color,
+                });
+              }
+              console.log(RCM_LIST)
+              setForYou(RCM_LIST)
+            }
+
+          })
+          /*.then(json =>{
+            console.log(json.data)
+            console.log("Good")
+          })*/
+          .catch(err => {
+            console.log("Bad")
+            console.log(err)
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    fetchData();
+
     fetchDoc();
-  }, []);
+  }, [reload]);
+
+  //Scroll screen to top
+  const scrollViewRef = useRef();
+  const scrollToTop = () => {
+    scrollViewRef.current.scrollTo({ y: 0, animated: true });
+  };
+
 
   return (
     <View style={{ flex: 1 }}>
-      <Image
-        source={{
-          uri: imageUrl
-        }}
-        resizeMode="contain"
-        style={{
-          flex: 1
-        }} />
+      <ScrollView ref={scrollViewRef}
+        style={{ flex: 1 }}>
+        <Image
+          source={{
+            uri: imageUrl
+          }}
+          resizeMode="contain"
+          style={{
+            height: 750
+          }} />
+
+        <Text
+          style={{
+            fontSize: 26,
+            fontWeight: "600",
+            color: colors.text,
+            textShadowColor: "rgba(0,0,0,0.2)",
+            textShadowOffset: {
+              height: 1,
+              width: 0,
+            },
+            textShadowRadius: 4,
+            paddingBottom: 20,
+            paddingLeft: 20,
+          }}
+        >
+          You may also like
+        </Text>
+
+        <MasonryList
+          data={forYou}
+          numColumns={2}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, i }) => {
+            return (
+              <View style={{ padding: 6, paddingBottom: 100 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    reloadScreen();
+                    scrollViewRef.current.scrollTo({ y: 0, animated: true });
+                    navigation.navigate("Details Screen", {
+                      id: item.id,
+                      imageUrl: item.imageUrl,
+                      price: item.price,
+                      name: item.title,
+                      description: item.description,
+                      color: item.color,
+                    });
+                  }}
+                >
+                  <View
+                    style={{
+                      aspectRatio: i === 0 ? 1 : 2 / 3,
+                      position: "relative",
+                      overflow: "hidden",
+                      backgroundColor: colors.background,
+                      borderRadius: 24,
+                    }}>
+                    <Image
+                      source={{ uri: item.imageUrl }}
+                      resizeMode="cover"
+                      style={StyleSheet.absoluteFill} />
+
+                    <View style={[StyleSheet.absoluteFill,
+                    { padding: 12, }]
+                    }>
+                      <View style={{ flexDirection: "row", gap: 8, padding: 4 }}>
+                        <Text
+                          style={{
+                            flex: 1,
+                            fontSize: 16,
+                            fontWeight: "600",
+                            color: colors.text,
+                            textShadowColor: "rgba(0,0,0,0.2)",
+                            textShadowOffset: {
+                              height: 1,
+                              width: 0,
+                            },
+                            textShadowRadius: 4,
+                          }}>
+                          {item.title}
+                        </Text>
+                        <View
+                          style={{
+                            backgroundColor: colors.background,
+                            borderRadius: 100,
+                            height: 32,
+                            aspectRatio: 1,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}>
+                          <Icon name={!favouriteString.includes(item.id) ? 'heart-outline' : 'heart'} size={20} color={!favouriteString.includes(item.id) ? '#000' : 'red'} />
+                        </View>
+                      </View>
+
+                      <View style={{ flex: 1, }} />
+                      <BlurView
+                        style={{
+                          flexDirection: "row",
+                          backgroundColor: "rgba(0, 0, 0, 0.45)",
+                          alignItems: "center",
+                          padding: 8,
+                          borderRadius: 100,
+                          overflow: "hidden"
+                        }}
+                        intensity={20}>
+                        <Text
+                          style={{
+                            flex: 1,
+                            fontSize: 16,
+                            fontWeight: "600",
+                            color: "#fff",
+                            marginLeft: 8,
+                          }}
+                          numberOfLines={1}>
+                          ${item.price}
+                        </Text>
+
+                        <TouchableOpacity
+                          onPress={() => { handleAddToCart(item) }}
+                          style={{
+                            paddingHorizontal: 16,
+                            paddingVertical: 8,
+                            borderRadius: 100,
+                            backgroundColor: "#fff"
+                          }}>
+                          <Icon name="basket-outline" size={20} color="#000" />
+                        </TouchableOpacity>
+                      </BlurView>
+
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>);
+          }}
+          onEndReachedThreshold={0.1}
+        />
+      </ScrollView>
 
       <SafeAreaView
         edges={["top"]}
@@ -112,6 +353,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
           left: 0,
           right: 0
         }}>
+
         <StatusBar style="light" />
         <View
           style={{
@@ -172,7 +414,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
       <BottomSheet
         ref={bottomSheetRef}
         index={0}
-        snapPoints={[64, 500]}
+        snapPoints={[80, 500]}
         detached={true}
         style={{ marginHorizontal: 20 }}
         bottomInset={insets.bottom + 20}

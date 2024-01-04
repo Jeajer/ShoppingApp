@@ -1,2 +1,2 @@
-import function_package.read_data_function
-import function_package.content_base_function
+import backend.recommendation_system.package.read_data_function
+import backend.recommendation_system.package.content_base_function

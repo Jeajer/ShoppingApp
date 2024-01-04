@@ -23,9 +23,15 @@ def get_dataframe_firebase():
         # Kiểm tra xem tài liệu Firestore có chứa đủ thông tin cho 3 cột hay không
         if "id" in doc_data and "brand" in doc_data and "gender" in doc_data:
             row = {
-                "ID": doc_data["id"],
+                "PId": doc_data["id"],
                 "Brand": doc_data["brand"],
+                "Category": doc_data["category"],
+                "Color": doc_data["color"],
+                "Description": doc_data["description"],
                 "Gender": doc_data["gender"],
+                "Img": doc_data["img"],
+                "Name": doc_data["name"],
+                "Price": doc_data["price"],
             }
             data.append(row)
 
