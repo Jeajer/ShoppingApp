@@ -56,17 +56,16 @@ const ShoppingScreen = ({ navigation }) => {
   const [customer, setCustomer] = useState([]);
 
   useEffect(() => {
-    if(user)
-    {
+    if (user) {
       const unsub = onSnapshot(doc(FIREBASE_DB, "Users", user.uid), (doc) => {
         const orderData = doc.data();
         setCustomer(orderData);
         console.log(customer);
-      }); 
+      });
 
       return () => {
         unsub();
-      }; 
+      };
     }
   }, []);
 
@@ -86,21 +85,21 @@ const ShoppingScreen = ({ navigation }) => {
   }
 
   const handleAddToCart = async (item) => {
-      try {
-        await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid, "Carts", item.id), {
-          id: item.id,
-          description: item.description,
-          name: item.title,
-          price: item.price,
-          img: item.imageUrl,
-          color: item.color,
-          quantity: 1,
-        });
-      } catch (error) {
-        console.log(error.message)
-      } finally {
-        console.log('Successfully added')
-      }
+    try {
+      await setDoc(doc(FIREBASE_DB, "Users", FIREBASE_AUTH.currentUser.uid, "Carts", item.id), {
+        id: item.id,
+        description: item.description,
+        name: item.title,
+        price: item.price,
+        img: item.imageUrl,
+        color: item.color,
+        quantity: 1,
+      });
+    } catch (error) {
+      console.log(error.message)
+    } finally {
+      console.log('Successfully added')
+    }
     alert('Successfully added')
   }
 
@@ -118,8 +117,8 @@ const ShoppingScreen = ({ navigation }) => {
             title: doc.data().name,
             price: doc.data().price,
             id: doc.id,
-            description: doc.data().description,    
-            color: doc.data().color,        
+            description: doc.data().description,
+            color: doc.data().color,
           });
         } else {
           SHOES_LIST_DATA.push({
@@ -152,15 +151,17 @@ const ShoppingScreen = ({ navigation }) => {
       setShoesCollection(shoesQuery);
 
       let favouriteStr = '';
-
-      const favouriteSnap = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Favourite"));
-      if (favouriteSnap) {
-        favouriteSnap.forEach((doc) => {
-          favouriteStr = favouriteStr + doc.data().id + ' ';
-        });
+      if (user) {
+        const favouriteSnap = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Favourite"));
+        if (favouriteSnap) {
+          favouriteSnap.forEach((doc) => {
+            favouriteStr = favouriteStr + doc.data().id + ' ';
+          });
+        }
+        setFavouriteString(favouriteStr)
       }
-      setFavouriteString(favouriteStr)
     }
+
     fetchDoc();
   }, []);
 
@@ -456,7 +457,7 @@ const ShoppingScreen = ({ navigation }) => {
                         </Text>
 
                         <TouchableOpacity
-                          onPress={() => {handleAddToCart(item)}}
+                          onPress={() => { handleAddToCart(item) }}
                           style={{
                             paddingHorizontal: 16,
                             paddingVertical: 8,
@@ -469,7 +470,7 @@ const ShoppingScreen = ({ navigation }) => {
 
                     </View>
                   </View>
-                </TouchableOpacity>                
+                </TouchableOpacity>
               </View>);
           }}
           onEndReachedThreshold={0.1}
