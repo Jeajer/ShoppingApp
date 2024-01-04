@@ -5,4 +5,4 @@ from ..models import Package
 class PackageModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
-        fields = ("id", "name", "quantity", "listJson", "date")
+        fields = ("id", "name", "quantity", "date")
