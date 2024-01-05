@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { View, FlatList, Text, StyleSheet, ScrollView, TouchableOpacity, Image, } from 'react-native';
+import { View, Alert, Modal, Pressable, FlatList, Text, StyleSheet, ScrollView, TouchableOpacity, Image, } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { AirbnbRating, Rating } from 'react-native-ratings';
 import {
   doc,
   setDoc,
@@ -37,7 +38,7 @@ const ORDER_LIST = [
 
 const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
   const { colors } = useTheme();
-
+  const [modalVisible, setModalVisible] = useState(false);
   const [resultArray, setResultArray] = useState([]);
   const [cancel, setCancel] = useState('')
 
@@ -93,6 +94,7 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
                   height: 1,
                   width: 0,
                 },
+                width: 150,
                 textShadowRadius: 4,
               }}>
               {item.title}
@@ -121,6 +123,19 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
               }}>
               Quantity: {item.quantity}
             </Text>
+
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={{
+                alignItems: "center",
+                backgroundColor: colors.text,
+                paddingHorizontal: 5,
+                paddingVertical: 5,
+                borderRadius: 5,
+                width: 50,
+              }}>
+              <Text style={{ fontSize: 10, fontWeight: "500", color: "white" }}>Rating</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={{ justifyContent: "flex-end", alignItems: "flex-end" }}>
@@ -148,6 +163,50 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
       gap: 20,
       flex: 1,
     }}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 22,
+          }}>
+          <View 
+            style={{ 
+              margin: 20,
+              backgroundColor: 'white',
+              borderRadius: 20,
+              padding: 35,
+              alignItems: 'flex-end',
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 4,
+              elevation: 5,
+            }}>
+            <TouchableOpacity
+              onPress={() => setModalVisible(!modalVisible)}
+              style={{
+                margin: -10,
+                width: 20,
+              }}>
+              <Icon name='close' size={20} color="#000" />
+            </TouchableOpacity>
+            <AirbnbRating
+              size={24}/>
+          </View>
+        </View>
+      </Modal>
       <View style={{
         paddingHorizontal: 24,
         justifyContent: "center",
