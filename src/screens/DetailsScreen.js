@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
 import MasonryList from '@react-native-seoul/masonry-list';
 import axios from 'axios'
-import publicIP from 'react-native-public-ip';
+import NetworkInfo from 'react-native-network-info';
 
 
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
@@ -54,7 +54,9 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
       }
     } else {
       alert('You have to login first')
-
+      NetworkInfo.getIPAddress(ipv4 => {
+        console.log(ipv4);
+      });
     }
   };
 
@@ -118,7 +120,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
 
     const fetchData = async () => {
       try {
-        axios.get("http://10.0.23.91:8000/api/content")
+        axios.get("http://10.0.20.86:8000/api/content")
           .then(res => {
             //console.log(res)
             setRCMProducts(res.data)
@@ -131,7 +133,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
               }
             }
             if (!check) {
-              axios.post('http://10.0.23.91:8000/api/content/', {
+              axios.post('http://10.0.20.86:8000/api/content/', {
                 "name": id,
                 "recommendation": ""
               })
