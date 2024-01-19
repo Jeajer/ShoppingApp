@@ -102,7 +102,7 @@ const DeliveredScreen = ({ navigation }) => {
           alignItems: "center",
         }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Detail Order Screen", {id: item.order, text: "Delivered"})}
+            onPress={() => navigation.navigate("Detail Order Screen", {id: item.order})}
             style={{
               alignItems: "center",
               backgroundColor: colors.text,

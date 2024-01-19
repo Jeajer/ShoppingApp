@@ -36,15 +36,11 @@ const ORDER_LIST = [
 
 ];
 
-const DetailOrderScreen = ({ navigation, route: { params: { id, text } } }) => {
+const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
   const { colors } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [resultArray, setResultArray] = useState([]);
   const [cancel, setCancel] = useState('')
-  const [rating, setRating] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
-  const [productID, setProductID] = useState('')
-  const user = FIREBASE_AUTH.currentUser;
 
   useEffect(() => {
     const fetchDoc = async () => {
@@ -59,51 +55,10 @@ const DetailOrderScreen = ({ navigation, route: { params: { id, text } } }) => {
         // docSnap.data() will be undefined in this case
         console.log("No such document!");
       }
-      if(text === "Delivered"){
-        setIsVisible(true)
-      }
     }
 
-    const unsub = onSnapshot(doc(FIREBASE_DB, "Users", user.uid), (doc) => {
-      const orderData = doc.data();
-      setCustomer(orderData);
-      console.log(customer);
-    });
-
     fetchDoc();
-    unsub();
   }, [])
-
-  const handleFinishRating = () => {
-    setModalVisible(!modalVisible)
-    const newData = {
-      ratings: [{
-        rating: rating,
-        userID: user.uid,
-      }],
-    };
-
-    db.collection("Products")
-      .doc(productID)
-      .set(newData, { merge: true })
-      .then(() => {
-        console.log('Tài liệu đã được cập nhật thành công');
-      })
-      .catch((error) => {
-        console.error('Lỗi khi cập nhật tài liệu:', error);
-      });
-  }
-
-  const handleRatingClick = (id) => {
-    setModalVisible(true)
-    setProductID(id)
-    console.log(id)
-  }
-
-  const handleRating = (ratingValue) => {
-    setRating(ratingValue)
-    console.log(ratingValue);
-  }
 
   const RenderItem = ({ item, index }) => {
     return (
@@ -169,22 +124,18 @@ const DetailOrderScreen = ({ navigation, route: { params: { id, text } } }) => {
               Quantity: {item.quantity}
             </Text>
 
-            {isVisible &&
-              <TouchableOpacity
-                onPress={() => handleRatingClick(item.id)}
-                visible="false"
-                style={{
-                  alignItems: "center",
-                  backgroundColor: colors.text,
-                  paddingHorizontal: 5,
-                  paddingVertical: 5,
-                  borderRadius: 5,
-                  width: 50,
-                }}>
-                <Text style={{ fontSize: 10, fontWeight: "500", color: "white" }}>Rating</Text>
-              </TouchableOpacity>
-            }
-            
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={{
+                alignItems: "center",
+                backgroundColor: colors.text,
+                paddingHorizontal: 5,
+                paddingVertical: 5,
+                borderRadius: 5,
+                width: 50,
+              }}>
+              <Text style={{ fontSize: 10, fontWeight: "500", color: "white" }}>Rating</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={{ justifyContent: "flex-end", alignItems: "flex-end" }}>
@@ -227,8 +178,8 @@ const DetailOrderScreen = ({ navigation, route: { params: { id, text } } }) => {
             alignItems: 'center',
             marginTop: 22,
           }}>
-          <View
-            style={{
+          <View 
+            style={{ 
               margin: 20,
               backgroundColor: 'white',
               borderRadius: 20,
@@ -244,7 +195,7 @@ const DetailOrderScreen = ({ navigation, route: { params: { id, text } } }) => {
               elevation: 5,
             }}>
             <TouchableOpacity
-              onPress={() => handleFinishRating()}
+              onPress={() => setModalVisible(!modalVisible)}
               style={{
                 margin: -10,
                 width: 20,
@@ -252,10 +203,7 @@ const DetailOrderScreen = ({ navigation, route: { params: { id, text } } }) => {
               <Icon name='close' size={20} color="#000" />
             </TouchableOpacity>
             <AirbnbRating
-              size={24}
-              defaultRating={0}
-              onFinishRating={handleRating}
-            />
+              size={24}/>
           </View>
         </View>
       </Modal>
@@ -284,7 +232,7 @@ const DetailOrderScreen = ({ navigation, route: { params: { id, text } } }) => {
         }}>Detail Order</Text>
         {/* <View style={{ width: 30 }} /> */}
         {cancel && (
-          <TouchableOpacity onPress={() => navigation.navigate("Confirm Cancel Screen", { id: id })}>
+          <TouchableOpacity onPress={() => navigation.navigate("Confirm Cancel Screen", {id: id})}>
             <Text
               style={{
                 fontSize: 15,
