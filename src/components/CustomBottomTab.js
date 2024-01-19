@@ -1,12 +1,12 @@
-import { React, useRef, useState, useEffect, useMemo } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, Image, StatusBar, Pressable } from 'react-native';
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const CustomBottomTab = (props: BottomTabBarProps) => {
+const CustomBottomTab = (props) => {
     const { colors } = useTheme();
+
     return (
         <SafeAreaView edges={["bottom"]}>
             <View style={{
@@ -18,6 +18,7 @@ const CustomBottomTab = (props: BottomTabBarProps) => {
             }}>
                 {props.state.routes.map((route, i) => {
                     const isActive = i == props.state.index;
+
                     return (
                         <Pressable key={route.key}
                             style={{
@@ -51,6 +52,7 @@ const CustomBottomTab = (props: BottomTabBarProps) => {
                 })}
             </View>
         </SafeAreaView>
-    )
-}
-export default CustomBottomTab
+    );
+};
+
+export default CustomBottomTab;

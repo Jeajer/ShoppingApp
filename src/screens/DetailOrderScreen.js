@@ -9,14 +9,14 @@ import {
   doc,
   setDoc,
   getDoc,
-  collection,
+  serverTimestamp,
+  updateDoc,
   query,
+  collection,
   where,
-  getDocs,
   deleteDoc,
-  updateDoc
 } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../firebaseConfig';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
 
 const ORDER_LIST = [
   {
@@ -36,29 +36,140 @@ const ORDER_LIST = [
 
 ];
 
-const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
+let listRating = []
+
+const DetailOrderScreen = ({ navigation, route: { params: { id, status } } }) => {
   const { colors } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [resultArray, setResultArray] = useState([]);
-  const [cancel, setCancel] = useState('')
+  const [cancel, setCancel] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const [ratingValue, setRatingValue] = useState(0)
+  const [productID, setProductID] = useState('')
+  const [totalPrice, setTotalPrice] = useState(0)
+  const [totalQuantity, setTotalQuantity] = useState(0)
+  
+  const user = FIREBASE_AUTH.currentUser;
 
   useEffect(() => {
     const fetchDoc = async () => {
-      const docRef = doc(FIREBASE_DB, "Orders", id);
+      let st = ""
+      listRating = []
+      if (status === "Delivered") {
+        st = "Delivered"
+      }
+      else if (status === "Processing") {
+        st = "On Delivery"
+        setCancel(true)
+      }
+      else if (status === "Canceled") {
+        st = "Canceled"
+      }
+      const docRef = doc(FIREBASE_DB, "Users", user.uid, st, id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setResultArray(docSnap.data().product)
         if (docSnap.data().status === 'Processing') {
-          setCancel('Cancel');
+          setCancel(true);
         }
+        setTotalPrice(docSnap.data().totalprice)
+        setTotalQuantity(docSnap.data().totalquantity)
       } else {
         // docSnap.data() will be undefined in this case
         console.log("No such document!");
+      }
+
+      if (status === "Delivered") {
+        setIsVisible(true)
       }
     }
 
     fetchDoc();
   }, [])
+
+  const handleRating = (value) => {
+    setRatingValue(value)
+    console.log(value)
+  }
+
+  const handleRatingClick = async (id) => {
+    setProductID(id)
+    let temp = 0
+    let snapShot = []
+    try {
+      const docSnaps = await getDoc(doc(FIREBASE_DB, "Products", id));
+      if (docSnaps.data().ratings) {
+        for (let rate in docSnaps.data().ratings) {
+          if (docSnaps.data().ratings[rate].userID === user.uid) {
+            Alert.alert("You have already reviewed this product")
+            temp = 1
+          }
+        }
+        snapShot = docSnaps.data().ratings
+      }
+    } catch (e) {
+      console.log(e)
+    } finally {
+      if (temp === 0) {
+        setModalVisible(!modalVisible)
+        console.log(id)
+        console.log(snapShot)
+        listRating = snapShot
+        console.log(listRating)
+      }
+    }
+  }
+
+  const handleReceived = async () => {
+    try {
+      await setDoc(doc(FIREBASE_DB, "Users", user.uid, "Delivered", id), {
+        idacc: user.uid,
+        name: user.displayName,
+        product: resultArray,
+        status: 'Delivered',
+        time: serverTimestamp(),
+        totalprice: totalPrice,
+        totalquantity: totalQuantity,
+      });
+      await updateDoc(doc(FIREBASE_DB, "Orders", id), {
+        idacc: user.uid,
+        name: user.displayName,
+        product: resultArray,
+        status: 'Delivered',
+        time: serverTimestamp(),
+        totalprice: totalPrice,
+        totalquantity: totalQuantity,
+      });
+    } catch (error) {
+      console.log(error.message)
+    }
+    await deleteDoc(doc(FIREBASE_DB, "Users", user.uid, "On Delivery", id))
+    navigation.goBack();
+  }
+
+  const handleFinishRating = async () => {
+    setModalVisible(!modalVisible)
+    const docSnap = await getDoc(doc(FIREBASE_DB, "Products", productID));
+    console.log(productID)
+    console.log(listRating)
+    const newData = {
+      rating: ratingValue,
+      userID: user.uid,
+    };
+
+    listRating.push(newData);
+    console.log(listRating)
+
+    try {
+      await updateDoc(doc(FIREBASE_DB, "Products", productID),
+        {
+          ratings: listRating
+        })
+    } catch (e) {
+      console.log(e)
+    }
+
+  }
 
   const RenderItem = ({ item, index }) => {
     return (
@@ -124,18 +235,20 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
               Quantity: {item.quantity}
             </Text>
 
-            <TouchableOpacity
-              onPress={() => setModalVisible(true)}
-              style={{
-                alignItems: "center",
-                backgroundColor: colors.text,
-                paddingHorizontal: 5,
-                paddingVertical: 5,
-                borderRadius: 5,
-                width: 50,
-              }}>
-              <Text style={{ fontSize: 10, fontWeight: "500", color: "white" }}>Rating</Text>
-            </TouchableOpacity>
+            {isVisible &&
+              <TouchableOpacity
+                onPress={() => handleRatingClick(item.id)}
+                style={{
+                  alignItems: "center",
+                  backgroundColor: colors.text,
+                  paddingHorizontal: 5,
+                  paddingVertical: 5,
+                  borderRadius: 5,
+                  width: 50,
+                }}>
+                <Text style={{ fontSize: 10, fontWeight: "500", color: "white" }}>Rating</Text>
+              </TouchableOpacity>
+            }
           </View>
 
           <View style={{ justifyContent: "flex-end", alignItems: "flex-end" }}>
@@ -178,8 +291,8 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
             alignItems: 'center',
             marginTop: 22,
           }}>
-          <View 
-            style={{ 
+          <View
+            style={{
               margin: 20,
               backgroundColor: 'white',
               borderRadius: 20,
@@ -195,7 +308,7 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
               elevation: 5,
             }}>
             <TouchableOpacity
-              onPress={() => setModalVisible(!modalVisible)}
+              onPress={() => handleFinishRating()}
               style={{
                 margin: -10,
                 width: 20,
@@ -203,7 +316,10 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
               <Icon name='close' size={20} color="#000" />
             </TouchableOpacity>
             <AirbnbRating
-              size={24}/>
+              size={24}
+              defaultRating={1}
+              onFinishRating={handleRating}
+            />
           </View>
         </View>
       </Modal>
@@ -231,27 +347,45 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
           flex: 1,
         }}>Detail Order</Text>
         {/* <View style={{ width: 30 }} /> */}
-        {cancel && (
-          <TouchableOpacity onPress={() => navigation.navigate("Confirm Cancel Screen", {id: id})}>
+        {cancel && 
+          <TouchableOpacity onPress={() => navigation.navigate("Confirm Cancel Screen", { id: id })}>
             <Text
               style={{
                 fontSize: 15,
                 color: 'red'
               }}
             >
-              {cancel}
+              Cancel
             </Text>
           </TouchableOpacity>
-        )}
+        }
       </View>
 
-      <Text style={{
-        fontSize: 20,
-        fontWeight: "700",
+      <View style={{
         paddingHorizontal: 24,
+        justifyContent: "space-between",
+        alignItems: "space-between",
+        flexDirection: "row"
       }}>
-        Order: {id}
-      </Text>
+        <Text style={{
+          fontSize: 20,
+          fontWeight: "700",
+        }}>
+          Order: {id}
+        </Text>
+        {cancel &&
+          <TouchableOpacity onPress={() => handleReceived()}>
+            <Text
+              style={{
+                fontSize: 15,
+                color: 'green'
+              }}
+            >
+              Received
+            </Text>
+          </TouchableOpacity>
+        }
+      </View>
 
       <View style={{
         justifyContent: "flex-start",
@@ -300,7 +434,7 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
             fontWeight: "600",
             color: colors.text,
           }}>
-            ${(80).toLocaleString()}
+            ${(totalPrice).toLocaleString()}
           </Text>
         </View>
 
@@ -369,7 +503,7 @@ const DetailOrderScreen = ({ navigation, route: { params: { id } } }) => {
             fontWeight: "600",
             color: "red",
           }}>
-            ${(90).toLocaleString()}
+            ${(totalPrice + 10).toLocaleString()}
           </Text>
         </View>
 

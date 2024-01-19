@@ -4,7 +4,6 @@ import {
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
-  Theme,
 } from "@react-navigation/native";
 import StacksNavigator from "./src/navigators/StacksNavigator";
 import { useMemo } from "react";
@@ -16,38 +15,37 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 export default function App() {
   const colorScheme = useColorScheme();
 
-  const theme: Theme = useMemo(
-    () =>
-      colorScheme === "dark"
-        ? {
-            ...DarkTheme,
-            colors: {
-              ...DarkTheme.colors,
-              primary: "#fff",
-              text: "#fff",
-            },
-          }
-        : {
-            ...DefaultTheme,
-            colors: {
-              ...DefaultTheme.colors,
-              background: "#f5f5f5",
-              text: "#191919",
-              border: "#D9D9D9",
-              primary: "#191919",
-            },
-          },
+  const theme = useMemo(() =>
+    colorScheme === "dark"
+      ? {
+        ...DarkTheme,
+        colors: {
+          ...DarkTheme.colors,
+          primary: "#fff",
+          text: "#fff",
+        },
+      }
+      : {
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          background: "#f5f5f5",
+          text: "#191919",
+          border: "#D9D9D9",
+          primary: "#191919",
+        },
+      },
     [colorScheme]
   );
 
   return (
     <SafeAreaProvider style={{ flex: 1 }}>
-      <GestureHandlerRootView style={{flex: 1}}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <NavigationContainer theme={theme}>
           <BottomSheetModalProvider>
             <StacksNavigator />
           </BottomSheetModalProvider>
-          <StatusBar  />
+          <StatusBar />
         </NavigationContainer>
       </GestureHandlerRootView>
     </SafeAreaProvider>

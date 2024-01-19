@@ -27,15 +27,19 @@ import {
 const ConfirmCancelScreen = ({ navigation, route: { params: { id } } }) => {
     const { colors } = useTheme();
     const [loading, setLoading] = useState(false)
+    const user = FIREBASE_AUTH.currentUser;
 
     handleUpdate = async () => {
-        const cancelRef = doc(FIREBASE_DB, "Orders", id);
+        console.log(id)
+        const cancelRef = await doc(FIREBASE_DB, "Users", user.uid, "On Delivery", id);
+        const temp = await getDoc(cancelRef);
+        const change = await doc(FIREBASE_DB, "Orders", id)
         setLoading(true)
 
         try {
-            await updateDoc(cancelRef, {
-                status: 'Canceled'
-            })
+            await deleteDoc(doc(FIREBASE_DB, "Users", user.uid, "On Delivery", id))
+            await setDoc(doc(FIREBASE_DB, "Users", user.uid, "Canceled", id), temp.data());
+            await updateDoc(change, {status: "Canceled"})  
         } catch (error) {
             console.log(error.message)
         } finally {

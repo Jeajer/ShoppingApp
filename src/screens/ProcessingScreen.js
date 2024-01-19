@@ -13,7 +13,8 @@ import {
   Touchable,
   TouchableOpacity,
   FlatList,
-  Dimensions
+  Dimensions,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
@@ -48,30 +49,35 @@ const GENERAL_LIST = [
 
 const ProcessingScreen = ({ navigation }) => {
   const { colors } = useTheme();
-
+  const [refreshing, setRefreshing] = useState(false);
+  const user = FIREBASE_AUTH.currentUser;
   const [resultArray, setResultArray] = useState([]);
 
   useEffect(() => {
     const fetchValue = async () => {
-      const q = query(collection(FIREBASE_DB, "Orders"), where("status", "==", "Processing"));
-      const querySnapshot = await getDocs(q);
+      const q = query(collection(FIREBASE_DB, "Users", user.uid, "On Delivery"));
+      const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "On Delivery"));
       let productQuery = Object.freeze({ name: "Score", points: 157 });
       const listData = [];
       querySnapshot.forEach((doc) => {
         listData.push({
           order: doc.id,
-          data: doc.data().time,
+          data: doc.data(),
           quantity: doc.data().totalquantity,
           amount: doc.data().totalprice,
         })
       })
       productQuery = listData;
+      console.log(productQuery);
       setResultArray(productQuery);
 
     };
 
     fetchValue();
   }, [])
+
+  const handleRefresh = () => {
+  };
 
   const RenderItem = ({ item, index }) => {
     return (
@@ -106,7 +112,7 @@ const ProcessingScreen = ({ navigation }) => {
           alignItems: "center",
         }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Detail Order Screen", { id: item.order })}
+            onPress={() => navigation.navigate("Detail Order Screen", { id: item.order ,status: "Processing" })}
             style={{
               alignItems: "center",
               backgroundColor: colors.text,
@@ -143,7 +149,11 @@ const ProcessingScreen = ({ navigation }) => {
                 <RenderItem item={item} index={index} />
               </View>
             )
-          }} />
+          }} 
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+          />
       </View>
     </View>
   )
