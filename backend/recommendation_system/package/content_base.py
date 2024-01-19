@@ -108,7 +108,6 @@ def cosine_sim(matrix):
 
 
 def get_dataframe_firebase():
-    
 
     db = firestore.client()
 

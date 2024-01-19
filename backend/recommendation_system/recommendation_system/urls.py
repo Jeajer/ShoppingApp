@@ -23,4 +23,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("package.api.urls")),
     path("api/", include("content_base.urls")),
+    path("api/", include("collab_filtering.urls")),
 ]

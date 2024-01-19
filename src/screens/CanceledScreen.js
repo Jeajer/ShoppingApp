@@ -100,7 +100,7 @@ const CanceledScreen = ({ navigation }) => {
           alignItems: "center",
         }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Detail Order Screen", { id: item.order })}
+            onPress={() => navigation.navigate("Detail Order Screen", { id: item.order, text: "Canceled" })}
             style={{
               alignItems: "center",
               backgroundColor: colors.text,
