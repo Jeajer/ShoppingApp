@@ -120,7 +120,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
 
     const fetchData = async () => {
       try {
-        axios.get("http://10.0.20.86:8000/api/content")
+        axios.get("http://192.168.1.8:8000/api/content")
           .then(res => {
             //console.log(res)
             setRCMProducts(res.data)
@@ -133,7 +133,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
               }
             }
             if (!check) {
-              axios.post('http://10.0.20.86:8000/api/content/', {
+              axios.post('http://192.168.1.8:8000/api/content/', {
                 "name": id,
                 "recommendation": ""
               })
