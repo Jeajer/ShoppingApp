@@ -67,6 +67,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
   const [forYou, setForYou] = useState([])
   const [favouriteString, setFavouriteString] = useState('');
   const [rcmProducts, setRCMProducts] = useState([]);
+  const [rating, setRating] = useState(0)
 
   const RCM_LIST = []
 
@@ -88,7 +89,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
     }
     alert('Successfully added')
   }
-  
+
   //reload the screen
   const [reload, setReload] = useState(false);
 
@@ -105,7 +106,24 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
 
     const fetchDoc = async () => {
       if (user) {
+        let favouriteStr = ''
         const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Favourite"));
+        const checkRating = await getDoc(doc(FIREBASE_DB, "Products", id))
+
+        //Check average of rating
+        let arr = checkRating.data().ratings
+        if (arr) {
+          console.log(arr)
+          let average = 0;
+          let sum = 0;
+          for (let i in arr) {
+            sum += arr[i].rating
+          }
+          average = Math.round(sum / arr.length);
+          console.log(average);
+          setRating(average)
+        }
+
         if (querySnapshot) {
           querySnapshot.forEach((doc) => {
             favouriteStr = favouriteStr + doc.data().id + ' ';
@@ -443,7 +461,7 @@ const DetailsScreen = ({ navigation, route: { params: { id, name, price, descrip
                 {new Array(5).fill("").map((_, i) =>
                   <Icon
                     key={i}
-                    name={i < 3 ? "star" : "star-outline"}
+                    name={i < rating ? "star" : "star-outline"}
                     color={"#facc15"}
                     size={20} />)}
               </View>

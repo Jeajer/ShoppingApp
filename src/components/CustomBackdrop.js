@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
+import { BlurView } from "expo-blur";
 import Animated, {
   Extrapolate,
   interpolate,
@@ -7,11 +7,11 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import { BlurView } from "expo-blur";
+import { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
-const CustomBackdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
+const CustomBackdrop = ({ animatedIndex, style }) => {
   const containerAnimatedStyle = useAnimatedStyle(() => ({
     backgroundColor: `rgba(0,0,0,${interpolate(
       animatedIndex.value,
@@ -22,10 +22,7 @@ const CustomBackdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
   }));
 
   // styles
-  const containerStyle = useMemo(
-    () => [style, containerAnimatedStyle],
-    [style]
-  );
+  const containerStyle = useMemo(() => [style, containerAnimatedStyle], [style]);
 
   const blurViewProps = useAnimatedProps(() => {
     return {

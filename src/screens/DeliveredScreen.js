@@ -46,11 +46,12 @@ const DeliveredScreen = ({ navigation }) => {
 
   const [resultArray, setResultArray] = useState([]);
   const [resultOrder, setResultOrder] = useState([]);
+  const user = FIREBASE_AUTH.currentUser;
 
   useEffect(() => {
     const fetchValue = async () => {
-      const q = query(collection(FIREBASE_DB, "Orders"), where("status", "==", "Delivered"));
-      const querySnapshot = await getDocs(q);
+      const q = query(collection(FIREBASE_DB, "Users", user.uid, "Delivered"));
+      const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Delivered"));
       let productQuery = Object.freeze({ name: "Score", points: 157 });
       const listData = [];
       querySnapshot.forEach((doc) => {
@@ -102,7 +103,7 @@ const DeliveredScreen = ({ navigation }) => {
           alignItems: "center",
         }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Detail Order Screen", {id: item.order})}
+            onPress={() => navigation.navigate("Detail Order Screen", {id: item.order, status: "Delivered"})}
             style={{
               alignItems: "center",
               backgroundColor: colors.text,

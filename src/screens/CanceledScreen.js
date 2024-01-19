@@ -44,11 +44,12 @@ const CanceledScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
   const [resultArray, setResultArray] = useState([]);
+  const user = FIREBASE_AUTH.currentUser;
 
   useEffect(() => {
     const fetchValue = async () => {
       const q = query(collection(FIREBASE_DB, "Orders"), where("status", "==", "Canceled"));
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await getDocs(collection(FIREBASE_DB, "Users", user.uid, "Canceled"));
       let productQuery = Object.freeze({ name: "Score", points: 157 });
       const listData = [];
       querySnapshot.forEach((doc) => {
@@ -100,7 +101,7 @@ const CanceledScreen = ({ navigation }) => {
           alignItems: "center",
         }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Detail Order Screen", { id: item.order })}
+            onPress={() => navigation.navigate("Detail Order Screen", { id: item.order , status: "Canceled" })}
             style={{
               alignItems: "center",
               backgroundColor: colors.text,

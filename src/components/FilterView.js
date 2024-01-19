@@ -1,5 +1,5 @@
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import React, { ReactNode, useState } from "react";
 import { useTheme } from "@react-navigation/native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,24 +13,24 @@ const COLORS = [
   {
     color: "red",
     label: "Red",
-    itemCount:4,
+    itemCount: 4,
   },
   {
     color: "blue",
     label: "Blue",
-    itemCount:2,
+    itemCount: 2,
   },
   {
     color: "yellow",
     label: "Yellow",
-    itemCount:6,
+    itemCount: 6,
   },
   {
     color: "purple",
     label: "Purple",
-    itemCount:10,
+    itemCount: 10,
   },
-]
+];
 
 const SLEEVES = [
   {
@@ -48,109 +48,85 @@ const SLEEVES = [
     label: "Sleeve Less",
     itemCount: 60,
   },
-]
+];
 
 const FilterView = () => {
-  const [startPrice, seStartPrice] = useState(50);
+  const [startPrice, setStartPrice] = useState(50);
   const [endPrice, setEndPrice] = useState(250);
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+
   return (
     <View style={{ flex: 1 }}>
-      <BottomSheetScrollView style={{flex: 1}}>
-        <View style={{paddingVertical: 24, gap: 20}}>          
-        <View 
-          style={{ 
-            flexDirection: "row", 
-            alignItems: "center", 
-            paddingHorizontal: 24, 
-          }}>
-          <Text style={{flex: 1, fontSize: 20, fontWeight: "700"}}>
-            Filter
-          </Text>
-          <TouchableOpacity>
-            <Text>Reset</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Range Selector */}
-        <PriceRangeSelector 
-          minPrice={MIN_PRICE} 
-          maxPrice={MAX_PRICE}
-          startPrice={startPrice}
-          endPrice={endPrice}
-          onStartPriceChange={seStartPrice}
-          onEndPriceChange={setEndPrice}/>
-
-        {/* Sport Category Filter */}
-        {/* <View style={{paddingHorizontal: 24}}>
-          <Text 
+      <BottomSheetScrollView style={{ flex: 1 }}>
+        <View style={{ paddingVertical: 24, gap: 20 }}>
+          <View
             style={{
-              fontSize: 16,
-              fontWeight: "600",
-              marginBottom: 12,
-            }}>Sport</Text>
-          <View style={{flexDirection: "row", flexWrap: "wrap", gap: 12, }}>
-            {new Array(7).fill("").map((_, i) =>{
-              return (
-                <Chip itemCount={i} label="Item" isSelected={i === 0}/>
-              );
-            })}
-          
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 24,
+            }}>
+            <Text style={{ flex: 1, fontSize: 20, fontWeight: "700" }}>
+              Filter
+            </Text>
+            <TouchableOpacity>
+              <Text>Reset</Text>
+            </TouchableOpacity>
           </View>
-        </View> */}
 
-        {/* Color Filter */}
-        <View style={{paddingHorizontal: 24}}>
-          <Text 
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              marginBottom: 12,
-            }}>Color</Text>
-          <View style={{flexDirection: "row", flexWrap: "wrap", gap: 12, }}>
-            {COLORS.map((item, i) =>{
-              return (
-                <Chip 
-                  itemCount={item.itemCount} 
-                  label={item.label} 
-                  left={
-                    <View 
-                      style={{
-                        backgroundColor: item.color, 
-                        width: 12, 
-                        height: 12,
-                        borderRadius: 8,
-                      }}/>}
-                  isSelected={i === 0}/>
-              );
-            })}
-          
+          {/* Range Selector */}
+          <PriceRangeSelector
+            minPrice={MIN_PRICE}
+            maxPrice={MAX_PRICE}
+            startPrice={startPrice}
+            endPrice={endPrice}
+            onStartPriceChange={setStartPrice}
+            onEndPriceChange={setEndPrice} />
+
+          {/* Color Filter */}
+          <View style={{ paddingHorizontal: 24 }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                marginBottom: 12,
+              }}>Color</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
+              {COLORS.map((item, i) => {
+                return (
+                  <Chip
+                    key={i}
+                    itemCount={item.itemCount}
+                    label={item.label}
+                    color={item.color}
+                    isSelected={i === 0} />
+                );
+              })}
+            </View>
           </View>
-        </View>
 
-        {/* Sleeves Filter */}
-        <View style={{paddingHorizontal: 24}}>
-          <Text 
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              marginBottom: 12,
-            }}>Sleeves</Text>
-          <View style={{flexDirection: "row", flexWrap: "wrap", gap: 12, }}>
-            {SLEEVES.map((item, i) =>{
-              return (
-                <Chip 
-                  itemCount={item.itemCount} 
-                  label={item.label} 
-                  isSelected={i === 0}/>
-              );
-            })}
-          
+          {/* Sleeves Filter */}
+          <View style={{ paddingHorizontal: 24 }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                marginBottom: 12,
+              }}>Sleeves</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
+              {SLEEVES.map((item, i) => {
+                return (
+                  <Chip
+                    key={i}
+                    itemCount={item.itemCount}
+                    label={item.label}
+                    isSelected={i === 0} />
+                );
+              })}
+            </View>
           </View>
-        </View>
 
-        <View style={{flex: 1}}/>
+          <View style={{ flex: 1 }} />
         </View>
       </BottomSheetScrollView>
       {/* Button */}
@@ -159,7 +135,7 @@ const FilterView = () => {
           padding: 24,
           paddingBottom: 24 + insets.bottom,
         }}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={{
             backgroundColor: theme.colors.primary,
             height: 64,
@@ -168,16 +144,17 @@ const FilterView = () => {
             justifyContent: "center",
             position: "relative",
           }}>
-          <Text 
+          <Text
             style={{
               fontSize: 16,
               fontWeight: "600",
-              color: theme.colors.background}}>Apply filters</Text>
-          
+              color: theme.colors.background
+            }}>Apply filters</Text>
+
           <View
             style={{
               backgroundColor: theme.colors.card,
-              width:40,
+              width: 40,
               aspectRatio: 1,
               borderRadius: 40,
               alignItems: "center",
@@ -185,8 +162,9 @@ const FilterView = () => {
               position: "absolute",
               top: 12,
               right: 12,
-              bottom: 12}}>
-            <Icon name={"arrow-right"} size={24} color={theme.colors.text}/>
+              bottom: 12
+            }}>
+            <Icon name={"arrow-right"} size={24} color={theme.colors.text} />
           </View>
         </TouchableOpacity>
       </View>
@@ -196,38 +174,39 @@ const FilterView = () => {
 
 export default FilterView;
 
-
 const Chip = ({
-  isSelected, 
-  label, 
+  isSelected,
+  label,
   itemCount,
-  left
-}:{
-  isSelected: boolean, 
-  label: string, 
-  itemCount: number,
-  left?: ReactNode
+  color
 }) => {
   const theme = useTheme();
+
   return (
     <View
       style={{
-        paddingHorizontal: 16, 
-        paddingVertical: 8, 
+        paddingHorizontal: 16,
+        paddingVertical: 8,
         borderRadius: 100,
-        backgroundColor: isSelected ? theme.colors.text : theme.colors.background,
+        backgroundColor: isSelected ? color : theme.colors.background,
         flexDirection: "row",
-        alignItems: "center" }}>
-      {!!left && 
-        <View style={{marginRight: 4, }}>
-          {left}
-        </View>}
-      <Text 
+        alignItems: "center"
+      }}>
+      <View
+        style={{
+          backgroundColor: color,
+          width: 12,
+          height: 12,
+          borderRadius: 8,
+          marginRight: 4,
+        }} />
+      <Text
         style={{
           fontSize: 14,
           fontWeight: "600",
-          color: isSelected ? theme.colors.background : theme.colors.text }}>
-          {label} [{itemCount}]
+          color: isSelected ? theme.colors.background : theme.colors.text
+        }}>
+        {label} [{itemCount}]
       </Text>
     </View>
   );

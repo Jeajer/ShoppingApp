@@ -40,9 +40,17 @@ const CheckOutScreen = ({ navigation }) => {
     const i = 0;
 
     try {
+      await addDoc(collection(FIREBASE_DB, "Users", user.uid, "On Delivery"), {
+        idacc: user.uid,
+        name: user.displayName,
+        product: resultArray,
+        status: 'Processing',
+        time: serverTimestamp(),
+        totalprice: calculateTotalPrice(),
+        totalquantity: calculateTotalQuan(),
+      });
       await addDoc(collection(FIREBASE_DB, "Orders"), {
         idacc: user.uid,
-        img: 'https://firebasestorage.googleapis.com/v0/b/shopping-app-691fd.appspot.com/o/2%20-%20xkzoVAj.png?alt=media&token=ba013fa0-91c2-4869-a1af-6bdbdada9f2b',
         name: user.displayName,
         product: resultArray,
         status: 'Processing',
@@ -53,6 +61,8 @@ const CheckOutScreen = ({ navigation }) => {
     } catch (error) {
       console.log(error.message)
     }
+
+
 
     // const collectionRef = await getDocs(collection(FIREBASE_DB, "Orders"));
     // const newestDoc = '';
@@ -136,6 +146,7 @@ const CheckOutScreen = ({ navigation }) => {
     setUserData(userData);
     productQuery = listData;
     setResultArray(productQuery);
+    console.log(resultArray)
   };
 
   useEffect(() => {

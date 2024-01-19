@@ -1,7 +1,6 @@
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { isAssertEntry } from 'typescript'
 
 const Input = ({title, icon, placeholder, isPassword, keyboard, onFocus, onChangeText, value, maxLength}) => {
 
